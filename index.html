@@ -552,7 +552,8 @@
     ];
 
     // Lesetexte: Jede Person bearbeitet 2 Texte mit je 3 Fragen. Der Text wird
-    // passend zur aktuellen Stufe gewählt (oberhalb von B2 ein B2-Text). Die
+    // passend zur aktuellen Stufe gewählt (A1 bis C2, je Stufe mindestens ein
+    // Text, ab A2 je zwei). Die
     // Antworten verändern die adaptive Stufe nicht und werden als eigener
     // Bereich "Leseverstehen" ausgewiesen. Kontexte: Alltag, Büro/Handel, Gesundheit.
     const lesetexte = [
@@ -604,12 +605,40 @@
             { id: "L-B2b-1", konstrukt: "Leseverstehen (Hauptaussage)", q: "Why is the new procedure being introduced?", options: ["Information has sometimes been lost between shifts", "Patients have complained about long waiting times", "There are not enough nurses on the ward", "The old forms were too long"], answer: 0 },
             { id: "L-B2b-2", konstrukt: "Leseverstehen (Detail)", q: "How will staff get time for the handover?", options: ["Shifts will overlap by an extra fifteen minutes", "Nurses will work one extra day per month", "Team leaders will complete the forms", "The form will only be used at weekends"], answer: 0 },
             { id: "L-B2b-3", konstrukt: "Leseverstehen (Schlussfolgerung)", q: "What does the memo say about the form itself?", options: ["It may be changed after staff have given feedback", "It replaces all other patient records", "It is only needed for new patients", "It must be sent to the team leader by e-mail"], answer: 0 }
+          ] },
+        { id: "L-C1a", stufe: 4, titel: "The office is dead – long live the office?",
+          text: "When the pandemic forced millions to work from home, many commentators predicted the end of the traditional office. Three years on, the picture is considerably more nuanced. Most large employers have settled on hybrid arrangements, yet attendance on the days staff are expected in remains stubbornly low. Managers complain that spontaneous exchanges – the overheard conversation that solves a problem, the quick question by the coffee machine – have all but disappeared. Employees, for their part, point out that commuting for an hour only to sit in video calls at a desk makes little sense. What both sides seem to agree on, albeit reluctantly, is that the office will survive only if it offers something that cannot be had at home. Simply ordering people back, it appears, is not enough.",
+          fragen: [
+            { id: "L-C1a-1", konstrukt: "Leseverstehen (Hauptaussage)", q: "What is the writer's main point?", options: ["Offices will only stay relevant if they offer something people cannot get at home", "The traditional office has completely disappeared", "Employers should order their staff back to the office full-time", "Hybrid working has solved the problems of working from home"], answer: 0 },
+            { id: "L-C1a-2", konstrukt: "Leseverstehen (Schlussfolgerung)", q: "Why do employees question going into the office?", options: ["They often spend the day doing what they could do at home", "They are no longer allowed to work from home", "The offices are too crowded on the fixed days", "Their managers rarely come in themselves"], answer: 0 },
+            { id: "L-C1a-3", konstrukt: "Leseverstehen (Wortschatz im Kontext)", q: "What does \"albeit reluctantly\" suggest about the agreement?", options: ["Both sides accept it, although they do not like it", "Both sides are enthusiastic about it", "Only the managers accept it", "The agreement is likely to change soon"], answer: 0 }
+          ] },
+        { id: "L-C1b", stufe: 4, titel: "Artificial intelligence in the radiology department",
+          text: "A recent study at a large teaching hospital found that an AI system detected early signs of breast cancer on mammograms about as reliably as experienced radiologists. Headlines were quick to suggest that machines might soon replace doctors. The researchers themselves, however, drew a far more cautious conclusion. The system performed best when its results were checked by a radiologist, and it produced a notable number of false alarms in women with dense breast tissue. Moreover, the study was carried out in a single hospital, so it remains unclear whether the results would hold elsewhere. The authors therefore recommend using the software as a \"second reader\" to support, rather than substitute, human judgement – at least until larger trials have been completed.",
+          fragen: [
+            { id: "L-C1b-1", konstrukt: "Leseverstehen (Hauptaussage)", q: "How do the researchers' conclusions differ from the headlines?", options: ["They see the AI system as support for doctors, not as a replacement", "They believe AI will replace radiologists sooner than expected", "They found the AI system unreliable in all cases", "They think the study proves that AI is better than doctors"], answer: 0 },
+            { id: "L-C1b-2", konstrukt: "Leseverstehen (Detail)", q: "Which limitation of the study is mentioned?", options: ["It was carried out in only one hospital", "Too few radiologists took part", "The AI system missed most of the cancers", "Many patients refused to take part"], answer: 0 },
+            { id: "L-C1b-3", konstrukt: "Leseverstehen (Schlussfolgerung)", q: "What does \"at least until larger trials have been completed\" imply?", options: ["The recommendation may change when more evidence is available", "Larger trials have already confirmed the results", "The software should not be used before then", "Radiologists will no longer be needed after the trials"], answer: 0 }
+          ] },
+        { id: "L-C2a", stufe: 5, titel: "Measuring what matters",
+          text: "There is a seductive logic to the idea that whatever can be measured can be improved. Call centres time their calls, hospitals count their waiting times, schools rank their pupils – and in each case the figures dutifully rise. Yet anyone who has been cut off by an agent racing to hit a target, or discharged a day too early to keep a ward's statistics respectable, will recognise the flaw. The moment a number becomes the goal rather than a rough indicator, people learn, quite rationally, to serve the number. None of this is an argument against measurement as such; it is an argument against mistaking the map for the territory. The irony is that the organisations most proud of their dashboards are often the least aware of what those dashboards have quietly ceased to show.",
+          fragen: [
+            { id: "L-C2a-1", konstrukt: "Leseverstehen (Haltung des Autors)", q: "What is the writer's central argument?", options: ["Targets distort behaviour once the number matters more than what it stands for", "Organisations should stop measuring their performance altogether", "Call centres and hospitals simply measure the wrong things", "Figures usually rise because organisations become more efficient"], answer: 0 },
+            { id: "L-C2a-2", konstrukt: "Leseverstehen (Wortschatz im Kontext)", q: "What does \"mistaking the map for the territory\" refer to?", options: ["Confusing an indicator with the reality it is meant to describe", "Using too many different measurements at the same time", "Failing to plan far enough ahead", "Measuring the performance of the wrong department"], answer: 0 },
+            { id: "L-C2a-3", konstrukt: "Leseverstehen (Schlussfolgerung)", q: "What is ironic, according to the last sentence?", options: ["Those who rely most on their figures may notice least what the figures hide", "Organisations with dashboards perform worse than those without", "Dashboards are usually too complicated to be understood", "Staff are proud of the dashboards, but managers are not"], answer: 0 }
+          ] },
+        { id: "L-C2b", stufe: 5, titel: "The limits of \"patient choice\"",
+          text: "Few political slogans are as difficult to argue with as \"patient choice\". Who, after all, would wish to deny people a say in their own treatment? And yet the phrase conceals as much as it reveals. Choice presupposes information, time and, not least, alternatives worth choosing between – conditions conspicuously absent for the elderly patient in a rural area served by a single overstretched clinic. For the articulate and well-connected, choice can indeed be empowering; for others, it risks becoming a polite way of shifting responsibility for failures of provision from the system to the individual. To criticise the rhetoric is not to dismiss the principle. It is merely to insist that a right one cannot exercise is, in practice, scarcely a right at all.",
+          fragen: [
+            { id: "L-C2b-1", konstrukt: "Leseverstehen (Haltung des Autors)", q: "What is the writer's attitude towards \"patient choice\"?", options: ["The principle is valuable but means little without the conditions to make it real", "Patients should not be allowed to make decisions about their treatment", "Patient choice works well for everyone as long as information is provided", "The slogan is mainly used by patients who want more services"], answer: 0 },
+            { id: "L-C2b-2", konstrukt: "Leseverstehen (Textabsicht)", q: "Why does the writer mention the elderly patient in a rural area?", options: ["To show someone who has a choice in theory but not in practice", "To prove that rural clinics provide poor treatment", "To argue that elderly patients do not want to make choices", "To show that choice matters more in rural areas"], answer: 0 },
+            { id: "L-C2b-3", konstrukt: "Leseverstehen (Schlussfolgerung)", q: "What risk does the writer see in the idea of choice?", options: ["It may shift the blame for poor services onto individual patients", "It may make treatment more expensive for the state", "It may leave doctors with too little influence", "It may confuse patients with too much information"], answer: 0 }
           ] }
     ];
 
     // Wählt einen noch nicht bearbeiteten Lesetext möglichst nah an der Stufe
     function waehleLesetext(stufe, benutzt) {
-        const ziel = Math.min(stufe, 3);
+        const ziel = stufe;
         const frei = lesetexte.filter(t => !benutzt.has(t.id));
         if (frei.length === 0) return lesetexte[0];
         const abstand = Math.min(...frei.map(t => Math.abs(t.stufe - ziel)));
