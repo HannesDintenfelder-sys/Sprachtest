@@ -108,8 +108,56 @@
             box-sizing: border-box;
             font-size: 15px;
         }
-        #quiz, #result, #tontest, #beispiel, #pruefcode-test {
+        #quiz, #result, #tontest, #beispiel, #pruefcode-test, #fortsetzen {
             display: none;
+        }
+        /* Englische Zeile unter dem deutschen Arbeitsauftrag (für Lernende mit anderer Erstsprache) */
+        .auftrag-en {
+            display: block;
+            font-weight: normal;
+            color: #5a6a6b;
+            font-size: 13px;
+        }
+        .englisch-hilfe summary {
+            cursor: pointer;
+            font-weight: bold;
+            color: #34495e;
+            margin-top: 10px;
+        }
+        .englisch-hilfe summary:focus-visible {
+            outline: 3px solid #1a1a1a;
+            outline-offset: 2px;
+        }
+        /* Kurze Ermutigung zur Halbzeit */
+        .ermutigung {
+            background: #e7f4ec;
+            color: #1b5e37;
+            border-radius: 5px;
+            padding: 8px 12px;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        .ermutigung:empty {
+            display: none;
+        }
+        /* Lesetext mit begrenzter Höhe und eigener Bildlaufleiste */
+        .lesetext-box {
+            white-space: pre-line;
+            background: #ffffff;
+            border: 1px solid #7b8389;
+            border-radius: 4px;
+            padding: 12px 15px;
+            max-height: 40vh;
+            overflow-y: auto;
+            line-height: 1.5;
+            font-size: 16px;
+        }
+        .lesetext-box:focus-visible {
+            outline: 3px solid #1a1a1a;
+            outline-offset: 2px;
+        }
+        #lesetext-bereich {
+            margin-bottom: 15px;
         }
         #student-form {
             display: block;
@@ -236,21 +284,41 @@
 <body>
 
 <main id="quiz-container">
+    <!-- Schritt 0: Unterbrochenen Test fortsetzen (nur nach Neuladen im selben Tab) -->
+    <div id="fortsetzen">
+        <h2>Test fortsetzen?</h2>
+        <p id="fortsetzen-text"></p>
+        <button type="button" id="fortsetzen-ja" class="action-btn start-btn">Weitermachen</button>
+        <button type="button" id="fortsetzen-nein" class="action-btn secondary-btn">Neu beginnen</button>
+    </div>
+
     <!-- Schritt 1: Schülerdaten erfassen -->
     <div id="student-form">
         <h2>Englisch-Einstufungstest</h2>
-        <!-- Einführung (C-37) -->
+        <!-- Einführung in einfacher Sprache, zusätzlich auf Englisch -->
         <div class="result-box" style="margin-bottom: 20px;">
             <strong>So funktioniert der Test</strong>
             <ul>
-                <li id="intro-umfang">Du bearbeitest 31 Aufgaben: Lückensätze, 2 kurze Lesetexte mit je 3 Fragen und 4 Höraufgaben. Für die Höraufgaben brauchst du Kopfhörer. Das dauert etwa 30 Minuten.</li>
-                <li>Die Aufgaben passen sich an dich an: Sie werden schwerer oder leichter. Das ist normal.</li>
-                <li>Du kannst nicht zurückgehen.</li>
-                <li>Wenn du eine Vermutung hast, wähle sie. Wenn du gar keine Idee hast, wähle „Ich weiß es nicht“.</li>
-                <li>Der Test wird nicht benotet. Er hilft deiner Lehrkraft, den Unterricht passend zu planen.</li>
+                <li id="intro-umfang">Du bearbeitest 31 Aufgaben: Lücken-Sätze, 2 kurze Texte zum Lesen und 4 Aufgaben zum Hören. Für das Hören brauchst du Kopfhörer.</li>
+                <li><strong>Es gibt kein Zeitlimit.</strong> Die meisten brauchen etwa 30 Minuten.</li>
+                <li>Die Aufgaben passen sich an dich an. Sie werden schwerer oder leichter. Das ist normal.</li>
+                <li>Du kannst nicht zurückgehen. Lies jede Aufgabe in Ruhe.</li>
+                <li>Du weißt die Antwort ungefähr? Dann wähle sie. Du hast gar keine Idee? Dann wähle „Ich weiß es nicht“.</li>
+                <li>Der Test ist keine Prüfung und bekommt keine Note. Er hilft deiner Lehrkraft, den Unterricht gut zu planen.</li>
             </ul>
+            <details class="englisch-hilfe" lang="en">
+                <summary>Instructions in English</summary>
+                <ul>
+                    <li id="intro-umfang-en">You will answer 31 questions: gap sentences, 2 short reading texts and 4 listening tasks. You need headphones for the listening tasks.</li>
+                    <li><strong>There is no time limit.</strong> Most people need about 30 minutes.</li>
+                    <li>The questions adapt to you. They get harder or easier. This is normal.</li>
+                    <li>You cannot go back. Take your time with each question.</li>
+                    <li>If you roughly know the answer, choose it. If you have no idea at all, choose <span lang="de">„Ich weiß es nicht“</span> (I don't know).</li>
+                    <li>This is not an exam and there is no mark. It helps your teacher to plan the lessons.</li>
+                </ul>
+            </details>
         </div>
-        <p style="text-align: center; color: #5a6a6b; margin-bottom: 25px;">Bitte gib deine Daten ein, um den Test zu starten.</p>
+        <p style="text-align: center; color: #5a6a6b; margin-bottom: 25px;">Bitte gib deinen Namen und deine Klasse ein.</p>
 
         <div class="form-group">
             <label for="student-name">Vor- und Nachname:</label>
@@ -268,7 +336,7 @@
     <div id="beispiel">
         <h2>Beispielaufgabe</h2>
         <p class="klein" style="text-align: center;">So sehen die Aufgaben aus. Diese Aufgabe zählt nicht.</p>
-        <div class="arbeitsauftrag">Wähle die passende Lösung für die Lücke.</div>
+        <div class="arbeitsauftrag">Wähle die passende Lösung für die Lücke.<span class="auftrag-en" lang="en">Choose the answer that fits the gap.</span></div>
         <div class="question-box" id="beispiel-frage" lang="en">My name _____ Anna.</div>
         <fieldset id="beispiel-optionen" aria-describedby="beispiel-frage" style="border: none; margin: 0; padding: 0; min-width: 0;">
             <legend class="sr-only">Antwortmöglichkeiten</legend>
@@ -285,7 +353,7 @@
     <!-- Schritt 1b: Tontest vor den Höraufgaben (gleiche Hörbedingungen für alle) -->
     <div id="tontest">
         <h2>Vorbereitung: Tontest</h2>
-        <p id="tontest-text">Im Test kommen 4 Höraufgaben vor. Bitte setze jetzt Kopfhörer auf und klicke auf „Probe abspielen“. Du hörst einen kurzen englischen Satz.</p>
+        <p id="tontest-text">Im Test gibt es 4 Aufgaben zum Hören. Setz jetzt bitte deine Kopfhörer auf. Klicke dann auf „Probe abspielen“. Du hörst einen kurzen Satz auf Englisch.</p>
         <div style="text-align: center;">
             <button type="button" id="tontest-play" class="action-btn audio-btn"><span aria-hidden="true">🔊 </span>Probe abspielen</button>
         </div>
@@ -293,8 +361,8 @@
         <button type="button" id="tontest-ok" class="action-btn start-btn">Ich habe den Satz gut gehört – Test starten</button>
         <button type="button" id="tontest-problem" class="action-btn secondary-btn">Ich höre nichts oder nur schlecht</button>
         <div id="tontest-problem-box" style="display: none;">
-            <p class="klein">Bitte melde dich bei deiner Lehrkraft und prüft gemeinsam Lautstärke und Kopfhörer. Danach kannst du die Probe erneut abspielen.</p>
-            <p class="klein">Nur nach Rücksprache mit der Lehrkraft: Du kannst den Test auch ohne Ton starten. Die Hörtexte werden dann als Text angezeigt. Das wird im Ergebnis vermerkt.</p>
+            <p class="klein">Melde dich bei deiner Lehrkraft. Prüft zusammen die Lautstärke und die Kopfhörer. Dann kannst du die Probe noch einmal abspielen.</p>
+            <p class="klein">Frag zuerst deine Lehrkraft: Wenn sie zustimmt, kannst du auch ohne Ton starten. Dann siehst du die Hörtexte als Text. Deine Lehrkraft sieht das im Ergebnis.</p>
             <button type="button" id="tontest-text-start" class="action-btn secondary-btn">Ohne Ton starten (Hörtexte als Text)</button>
         </div>
     </div>
@@ -303,22 +371,28 @@
     <div id="quiz">
         <h2 id="quiz-title">Sprachtest</h2>
         <div id="frage-kopf" tabindex="-1">
-            <div id="progress">Frage 1 von 25</div>
+            <div id="progress"></div>
+            <div id="ermutigung" class="ermutigung" role="status"></div>
+            <div id="arbeitsauftrag" class="arbeitsauftrag"></div>
+            <div id="question-text" class="question-box" lang="en"></div>
 
-            <!-- Audio-Bereich für Hörverstehens-Aufgaben -->
+            <!-- Audio-Bereich für Hörverstehens-Aufgaben: nach der Frage (erst lesen, dann hören) -->
             <div id="audio-container" style="display: none; margin-bottom: 15px; text-align: center;">
                 <button type="button" id="play-audio-btn" class="action-btn audio-btn">
                     <span aria-hidden="true">🔊 </span><span id="play-audio-label">Hörtext abspielen</span>
                 </button>
-                <div id="audio-hinweis" class="klein" style="white-space: pre-line;">Klicke auf den Button, um die englische Sprachausgabe zu hören.</div>
+                <div id="audio-hinweis" class="klein" style="white-space: pre-line;"></div>
             </div>
-
-            <div id="arbeitsauftrag" class="arbeitsauftrag"></div>
-            <div id="question-text" class="question-box" lang="en">Lade Frage...</div>
+        </div>
+        <!-- Lesetext in eigenem Kasten mit begrenzter Höhe: Frage, Text und Antworten
+             passen so auch auf dem Smartphone zusammen auf den Bildschirm -->
+        <div id="lesetext-bereich" style="display: none;">
+            <div id="lesetext" class="lesetext-box" lang="en" tabindex="0" role="region" aria-label="Lesetext"></div>
+            <div id="lesetext-scrollhinweis" class="klein"></div>
         </div>
         <fieldset id="options" aria-describedby="question-text"></fieldset>
         <button type="button" id="weiter-btn" class="action-btn" onclick="handleAnswer()" disabled>Weiter</button>
-        <div class="klein" style="text-align: center;">Wähle eine Antwort und klicke dann auf „Weiter“. Zurückgehen ist nicht möglich.</div>
+        <div class="klein" style="text-align: center;">Wähle eine Antwort. Klicke dann auf „Weiter“. Zurückgehen ist nicht möglich.</div>
     </div>
 
     <!-- Schritt 3: Ergebnis & Anzeige -->
@@ -329,10 +403,12 @@
         <p id="danke-text" style="font-size: 15px; line-height: 1.5;"></p>
 
         <div class="hinweis-box">
-            Wichtig: Dein Ergebnis ist erst bei deiner Lehrkraft, wenn du es abschickst.<br>
-            1. Klicke auf „Ergebnis an Lehrkraft senden“. Das Formular öffnet sich in einem neuen Tab.<br>
-            2. Klicke im Formular ganz unten auf „Absenden“.
+            Wichtig: Deine Lehrkraft bekommt dein Ergebnis erst, wenn du es abschickst.<br>
+            1. Klicke auf „Ergebnis an Lehrkraft senden“. Das Formular öffnet sich in einem neuen Fenster.<br>
+            2. Ändere im Formular nichts. Klicke ganz unten auf „Absenden“.
         </div>
+        <!-- Einordnung der vorausgefüllten Formularfelder (Niveau, Punkte) für die Lernenden -->
+        <p class="klein" id="formular-hinweis">Im Formular stehen schon Angaben für deine Lehrkraft, zum Beispiel ein Niveau und eine Punktzahl. Das ist keine Note. Die Punktzahl hängt davon ab, welche Aufgaben du bekommen hast, und lässt sich nicht mit anderen vergleichen. Deine Lehrkraft bespricht das Ergebnis mit dir.</p>
         <div style="text-align: center;">
             <a id="manual-forms-link" href="#" target="_blank" rel="noopener" class="action-btn start-btn" style="display: none; width: auto; text-decoration: none;">
                 Ergebnis an Lehrkraft senden
@@ -343,6 +419,7 @@
         <!-- Ergebnis für die Lehrkraft (C-38): standardmäßig eingeklappt -->
         <details id="lehrkraft-details">
             <summary>Ergebnis für die Lehrkraft</summary>
+            <p class="klein">Dieser Bereich ist für deine Lehrkraft. Die Angaben sind Hinweise für die Unterrichtsplanung, keine Note.</p>
             <div style="text-align: center;">
                 <div id="level-badge" class="level-badge"></div>
                 <div id="level-band" style="margin-top: 10px; font-weight: bold;"></div>
@@ -676,7 +753,14 @@
         return Math.max(0, Math.min(levelNames.length - 1, Math.floor(wert)));
     }
 
-    // antworten: Array von { stufe, richtig } (nur adaptiver Teil, ohne Hören)
+    // "Ich weiß es nicht" wird mit Teilkredit gewertet (übliche Behandlung
+    // ausgelassener Antworten bei 4 Optionen): wie ein Viertel Treffer. So werden
+    // vorsichtige Lernende, die bei Unsicherheit nicht raten, nicht systematisch
+    // tiefer eingestuft als Lernende, die raten. Im Erwartungswert lohnt sich
+    // dadurch weder Raten noch "Ich weiß es nicht" taktisch.
+    const TEILKREDIT_WEISS_NICHT = RATEWAHRSCHEINLICHKEIT;
+
+    // antworten: Array von { stufe, richtig, weissNicht } (nur Grammatik/Wortschatz)
     function ermittleNiveau(antworten) {
         let theta = VORANNAHME_MITTEL;
         let besteLL = -Infinity;
@@ -685,7 +769,11 @@
             let ll = -((t - VORANNAHME_MITTEL) ** 2) / (2 * VORANNAHME_STREUUNG ** 2);
             for (const a of antworten) {
                 const p = loesungswahrscheinlichkeit(t, a.stufe);
-                ll += Math.log(a.richtig ? p : 1 - p);
+                if (a.weissNicht) {
+                    ll += TEILKREDIT_WEISS_NICHT * Math.log(p) + (1 - TEILKREDIT_WEISS_NICHT) * Math.log(1 - p);
+                } else {
+                    ll += Math.log(a.richtig ? p : 1 - p);
+                }
             }
             if (ll > besteLL) {
                 besteLL = ll;
@@ -802,7 +890,8 @@
 
     // Mehrfachdurchläufe erkennbar machen (C-32): zufällige Durchlauf-ID und
     // Zähler der Versuche auf diesem Gerät (nur im Browser gespeichert)
-    const durchlaufId = Math.random().toString(36).slice(2, 8).toUpperCase();
+    let durchlaufId = Math.random().toString(36).slice(2, 8).toUpperCase();
+    let endZeit = null;
     let versuchAufGeraet = 1;
     let startUhrzeit = "";
 
@@ -820,12 +909,13 @@
         window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
     }
 
+    // Neutral formuliert: Die Texte stehen im Lehrkraft-Bereich, den auch Lernende aufklappen können
     const levelDescriptions = [
-        "Grundlegende Strukturen und Wörter (z. B. to be, einfache Fragen, Präsens, Zeitangaben) werden überwiegend erkannt. Für den Unterricht passt Material mit kurzen, einfachen Sätzen und viel Unterstützung.",
-        "Häufige Alltagsstrukturen (z. B. einfache Vergangenheit, Steigerung, Verlaufsform) werden überwiegend sicher erkannt. Für den Unterricht passen kurze, klar aufgebaute Texte mit Wortschatzhilfen.",
-        "Zentrale Strukturen der Mittelstufe (z. B. Present Perfect, Bedingungssätze, Passiv, indirekte Fragen) werden überwiegend sicher erkannt. Für den Unterricht passt alltagsnahes und berufsbezogenes Material mit gelegentlichen Hilfen.",
-        "Auch anspruchsvollere Strukturen (z. B. Past Perfect, Future Perfect, Gerundium und Infinitiv, Phrasal Verbs) werden überwiegend sicher erkannt. Für den Unterricht passt authentisches Material mit vertiefenden Zusatzaufgaben.",
-        "Auch seltenere und gehobene Strukturen (z. B. Inversion, Konjunktiv, feste Wendungen) werden überwiegend sicher erkannt. Anspruchsvolle Erweiterungsaufgaben sind sinnvoll.",
+        "Grundlegende Strukturen und Wörter (z. B. to be, einfache Fragen, Präsens, Zeitangaben) werden überwiegend erkannt. Passend sind kurze, klar aufgebaute Materialien mit Unterstützung, z. B. Wortlisten und Beispielsätze.",
+        "Häufige Alltagsstrukturen (z. B. einfache Vergangenheit, Steigerung, Verlaufsform) werden überwiegend sicher erkannt. Passend sind kurze, klar aufgebaute Texte mit Wortschatzhilfen.",
+        "Zentrale Strukturen der Mittelstufe (z. B. Present Perfect, Bedingungssätze, Passiv, indirekte Fragen) werden überwiegend sicher erkannt. Passend ist alltagsnahes und berufsbezogenes Material mit gelegentlichen Hilfen.",
+        "Auch anspruchsvollere Strukturen (z. B. Past Perfect, Future Perfect, Gerundium und Infinitiv, Phrasal Verbs) werden überwiegend sicher erkannt. Passend ist authentisches Material mit vertiefenden Zusatzaufgaben.",
+        "Auch seltenere und gehobene Strukturen (z. B. Inversion, Konjunktiv, feste Wendungen) werden überwiegend sicher erkannt. Passend sind anspruchsvolle Erweiterungsaufgaben.",
         "Auch seltene idiomatische Wendungen und sehr gehobene Strukturen werden überwiegend sicher erkannt. Oberhalb dieser Stufe kann der Test nicht weiter unterscheiden."
     ];
 
@@ -996,21 +1086,20 @@
         const rest = MAX_WIEDERGABEN - wiedergaben;
         if (rest <= 0) {
             playBtn.disabled = true;
-            label.textContent = "Hörtext wurde " + MAX_WIEDERGABEN + "-mal abgespielt";
-            audioHinweis.textContent = "Beantworte die Frage jetzt.";
+            label.textContent = "Hörtext " + MAX_WIEDERGABEN + "-mal gehört";
+            audioHinweis.textContent = "Du hast den Text " + MAX_WIEDERGABEN + "-mal gehört. Wähle jetzt die Antwort, die am besten passt.";
         } else {
             playBtn.disabled = false;
             label.textContent = wiedergaben === 0 ? "Hörtext abspielen" : "Hörtext noch einmal abspielen";
-            audioHinweis.textContent = "Du kannst den Hörtext höchstens " + MAX_WIEDERGABEN + "-mal abspielen (noch " + rest + "-mal).";
+            audioHinweis.textContent = wiedergaben === 0
+                ? "Lies zuerst die Frage und die Antworten. Hör dir dann den Text an. Du kannst ihn " + MAX_WIEDERGABEN + "-mal hören."
+                : "Du kannst den Text noch " + rest + "-mal hören.";
         }
     }
 
-    function loadNextQuestion() {
-        if (questionsAsked >= maxQuestions) {
-            showResult();
-            return;
-        }
-
+    // Wählt die nächste Aufgabe gemäß ABLAUF und setzt currentQuestionData /
+    // currentQuestionLevel (ohne Bildschirmausgabe).
+    function waehleNaechsteAufgabe() {
         const typ = ABLAUF[questionsAsked];
         if (typ === "L") {
             // Neuer Lesetext, wenn noch keiner läuft oder alle Fragen bearbeitet sind.
@@ -1037,8 +1126,10 @@
                 id: frage.id,
                 konstrukt: frage.konstrukt,
                 bereich: "L",
-                q: `Read the text.\n\n${aktuellerLesetext.titel}\n\n${aktuellerLesetext.text}\n\n` +
-                   `Question ${leseFrageIndex + 1} of ${aktuellerLesetext.fragen.length}: ${frage.q}`,
+                textId: aktuellerLesetext.id,
+                frageNr: leseFrageIndex + 1,
+                // Frage steht über dem Text, der Text in einem eigenen Kasten
+                q: `Question ${leseFrageIndex + 1} of ${aktuellerLesetext.fragen.length}: ${frage.q}`,
                 options: frage.options,
                 answer: frage.answer
             };
@@ -1055,19 +1146,76 @@
         usedQuestions.add(currentQuestionData.id);
         benutzteKonstrukte.add(currentQuestionData.konstrukt);
         wiedergaben = 0;
+    }
 
-        document.getElementById("progress").textContent = `Frage ${questionsAsked + 1} von ${maxQuestions}`;
-        // Kurzer deutscher Arbeitsauftrag je Aufgabentyp (C-37)
-        let auftrag = "Wähle die passende Lösung für die Lücke.";
-        if (currentQuestionData.bereich === "H") {
-            auftrag = textStattTon
-                ? "Lies den Hörtext und beantworte die Frage."
-                : "Hör dir den Text an und beantworte die Frage.";
-        } else if (currentQuestionData.bereich === "L") {
-            auftrag = "Lies den Text und beantworte die Frage.";
+    // Setzt den deutschen Arbeitsauftrag mit einer englischen Zeile darunter
+    function setzeArbeitsauftrag(deutsch, englisch) {
+        const el = document.getElementById("arbeitsauftrag");
+        el.textContent = deutsch;
+        const en = document.createElement("span");
+        en.className = "auftrag-en";
+        en.lang = "en";
+        en.textContent = englisch;
+        el.appendChild(en);
+    }
+
+    let angezeigterLesetextId = null;
+
+    // Zeigt currentQuestionData an (auch nach dem Fortsetzen eines unterbrochenen Tests)
+    function zeigeAufgabe() {
+        const bereich = currentQuestionData.bereich;
+        const bereichName = bereich === "H" ? "Hören" : bereich === "L" ? "Lesen" : "Grammatik und Wortschatz";
+        document.getElementById("progress").textContent =
+            `Frage ${questionsAsked + 1} von ${maxQuestions} · ${bereichName}`;
+
+        // Kurze Ermutigung zur Halbzeit
+        document.getElementById("ermutigung").textContent =
+            questionsAsked === Math.floor(maxQuestions / 2)
+                ? "Halbzeit! Du hast schon die Hälfte geschafft. Mach in Ruhe weiter."
+                : "";
+
+        // Arbeitsauftrag je Aufgabentyp, deutsch und englisch (C-37)
+        if (bereich === "H") {
+            if (textStattTon) {
+                setzeArbeitsauftrag("Lies den Hörtext und beantworte die Frage.",
+                    "Read the transcript and answer the question.");
+            } else {
+                setzeArbeitsauftrag("Lies zuerst die Frage und die Antworten. Hör dir dann den Text an.",
+                    "Read the question and the answers first. Then listen to the text.");
+            }
+        } else if (bereich === "L") {
+            if (currentQuestionData.frageNr > 1) {
+                setzeArbeitsauftrag("Neue Frage zum gleichen Text.", "A new question about the same text.");
+            } else {
+                setzeArbeitsauftrag("Lies den Text und beantworte die Frage.", "Read the text and answer the question.");
+            }
+        } else {
+            setzeArbeitsauftrag("Wähle die passende Lösung für die Lücke.", "Choose the answer that fits the gap.");
         }
-        document.getElementById("arbeitsauftrag").textContent = auftrag;
         document.getElementById("question-text").textContent = currentQuestionData.q;
+
+        // Lesetext in eigenem Kasten; bei Folgefragen zum selben Text bleibt die Leseposition erhalten
+        const leseBereich = document.getElementById("lesetext-bereich");
+        if (bereich === "L") {
+            const text = lesetexte.find(t => t.id === currentQuestionData.textId);
+            const kasten = document.getElementById("lesetext");
+            if (angezeigterLesetextId !== text.id) {
+                kasten.textContent = "";
+                const titel = document.createElement("strong");
+                titel.textContent = text.titel;
+                kasten.appendChild(titel);
+                kasten.appendChild(document.createTextNode("\n" + text.text));
+                kasten.scrollTop = 0;
+                angezeigterLesetextId = text.id;
+            }
+            leseBereich.style.display = "block";
+            document.getElementById("lesetext-scrollhinweis").textContent =
+                kasten.scrollHeight > kasten.clientHeight + 4
+                    ? "Der Text ist länger: Scrolle im Kasten nach unten, um alles zu lesen."
+                    : "";
+        } else {
+            leseBereich.style.display = "none";
+        }
 
         // Prüfen, ob die Frage eine Hörverstehens-Aufgabe ist
         const audioContainer = document.getElementById("audio-container");
@@ -1085,6 +1233,7 @@
                     wiedergaben++;
                     playListeningAudio(currentQuestionData.audioText);
                     aktualisiereAudioAnzeige();
+                    speichereZwischenstand(); // Neuladen setzt die Wiedergaben nicht zurück
                 };
             } else {
                 // Ohne Ton wäre die Aufgabe nicht lösbar: Text einblenden (wird vermerkt)
@@ -1150,8 +1299,117 @@
         eingabeSperreTimer = setTimeout(() => { optionsDiv.disabled = false; }, EINGABESPERRE_MS);
 
         antwortGesperrt = false;
-        // Fokus auf die neue Frage, damit Screenreader sie ansagen (C-36)
+        // Fokus auf die neue Frage, damit Screenreader sie ansagen (C-36). Der
+        // Lesetext liegt außerhalb dieses Bereichs und wird nicht jedes Mal neu vorgelesen.
         document.getElementById("frage-kopf").focus();
+    }
+
+    function loadNextQuestion() {
+        if (questionsAsked >= maxQuestions) {
+            showResult();
+            return;
+        }
+        waehleNaechsteAufgabe();
+        zeigeAufgabe();
+        speichereZwischenstand();
+    }
+
+    // ==== Zwischenstand (nur in diesem Browser-Tab, wird beim Schließen gelöscht) ====
+    // Nach versehentlichem Neuladen kann der Test an derselben Stelle weitergehen.
+    // sessionStorage statt localStorage: Auf geteilten Geräten bleibt nach dem
+    // Schließen des Tabs nichts zurück.
+    const ZWISCHENSTAND_SCHLUESSEL = "englischtest-zwischenstand";
+
+    function speichereZwischenstand() {
+        try {
+            sessionStorage.setItem(ZWISCHENSTAND_SCHLUESSEL, JSON.stringify({
+                version: 1,
+                phase: ergebnisBereit ? "ergebnis" : "test",
+                hoerteilAktiv, studentData, textStattTon, keineEnglischeStimme,
+                startZeit, startUhrzeit, endZeit, versuchAufGeraet, durchlaufId,
+                currentLevel, questionsAsked, totalScore, protokoll,
+                usedQuestions: [...usedQuestions],
+                benutzteKonstrukte: [...benutzteKonstrukte],
+                benutzteLesetexte: [...benutzteLesetexte],
+                aktuellerLesetextId: aktuellerLesetext ? aktuellerLesetext.id : null,
+                leseFrageIndex, currentQuestionData, currentQuestionLevel, wiedergaben,
+                uebermittlungGeoeffnet
+            }));
+        } catch (e) {
+            // Speicher nicht verfügbar: Test läuft trotzdem, nur ohne Fortsetzen
+        }
+    }
+
+    function ladeZwischenstand() {
+        try {
+            const daten = JSON.parse(sessionStorage.getItem(ZWISCHENSTAND_SCHLUESSEL) || "null");
+            if (!daten || daten.version !== 1 || daten.hoerteilAktiv !== hoerteilAktiv) return null;
+            return daten;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function stelleZwischenstandWiederHer(d) {
+        studentData = d.studentData;
+        textStattTon = d.textStattTon;
+        keineEnglischeStimme = d.keineEnglischeStimme;
+        startZeit = d.startZeit;
+        startUhrzeit = d.startUhrzeit;
+        endZeit = d.endZeit;
+        versuchAufGeraet = d.versuchAufGeraet;
+        durchlaufId = d.durchlaufId;
+        currentLevel = d.currentLevel;
+        questionsAsked = d.questionsAsked;
+        totalScore = d.totalScore;
+        protokoll.length = 0;
+        d.protokoll.forEach(p => protokoll.push(p));
+        usedQuestions = new Set(d.usedQuestions);
+        benutzteKonstrukte.clear();
+        d.benutzteKonstrukte.forEach(k => benutzteKonstrukte.add(k));
+        benutzteLesetexte.clear();
+        d.benutzteLesetexte.forEach(t => benutzteLesetexte.add(t));
+        aktuellerLesetext = d.aktuellerLesetextId ? lesetexte.find(t => t.id === d.aktuellerLesetextId) : null;
+        leseFrageIndex = d.leseFrageIndex;
+        currentQuestionData = d.currentQuestionData;
+        currentQuestionLevel = d.currentQuestionLevel;
+        uebermittlungGeoeffnet = d.uebermittlungGeoeffnet;
+    }
+
+    function verwerfeZwischenstand() {
+        try { sessionStorage.removeItem(ZWISCHENSTAND_SCHLUESSEL); } catch (e) { /* ohne Speicher nichts zu tun */ }
+    }
+
+    // Beim Laden: unterbrochenen Test anbieten bzw. Ergebnisseite wiederherstellen
+    function pruefeZwischenstand() {
+        const d = ladeZwischenstand();
+        if (!d) return;
+        document.getElementById("student-form").style.display = "none";
+        if (d.phase === "ergebnis") {
+            stelleZwischenstandWiederHer(d);
+            showResult();
+            document.getElementById("uebermittlung-status").textContent =
+                "Dein Ergebnis wurde wiederhergestellt. Falls du es noch nicht abgeschickt hast: Klicke auf „Ergebnis an Lehrkraft senden“.";
+            return;
+        }
+        document.getElementById("fortsetzen").style.display = "block";
+        document.getElementById("fortsetzen-text").textContent =
+            `Der Test von ${d.studentData.name} (Klasse ${d.studentData.schoolClass}) wurde unterbrochen. ` +
+            `Du warst bei Frage ${d.questionsAsked + 1} von ${maxQuestions}. Deine bisherigen Antworten sind gespeichert.`;
+        document.getElementById("fortsetzen-ja").onclick = () => {
+            stelleZwischenstandWiederHer(d);
+            wiedergaben = d.wiedergaben;
+            document.getElementById("fortsetzen").style.display = "none";
+            document.getElementById("quiz").style.display = "block";
+            testLaeuft = true;
+            zeigeAufgabe();
+        };
+        document.getElementById("fortsetzen-nein").onclick = () => {
+            verwerfeZwischenstand();
+            document.getElementById("fortsetzen").style.display = "none";
+            document.getElementById("student-form").style.display = "block";
+        };
+        document.getElementById("fortsetzen-ja").focus();
     }
 
     function handleAnswer() {
@@ -1244,6 +1502,7 @@
         stoppeSprachausgabe(); // Stoppt Sprachausgabe am Testende
         testLaeuft = false;
         ergebnisBereit = true;
+        if (!endZeit) endZeit = Date.now();
         document.getElementById("quiz").style.display = "none";
         document.getElementById("result").style.display = "block";
 
@@ -1265,7 +1524,7 @@
         const finalLevelName = levelNames[finalLevelIndex];
         const finalLevelDesc = niveau.gesichert
             ? levelDescriptions[finalLevelIndex]
-            : "Auch grundlegende Strukturen wurden im Test noch nicht sicher erkannt. Für den Unterricht passt Material mit sehr einfachen Sätzen, Bildern und viel Unterstützung. In den ersten Stunden genauer beobachten (ggf. auch Testbedingungen prüfen).";
+            : "Grundlegende Strukturen wurden im Test noch nicht sicher erkannt. Passend sind sehr einfache, kurze Materialien mit viel Unterstützung. Empfehlung: den Lernstand in den ersten Unterrichtswochen zusätzlich im Gespräch einschätzen und prüfen, ob die Testbedingungen (z. B. Ton, Gerät) gepasst haben.";
 
         // Neutrale, nicht stigmatisierende Rückmeldung an die Lernenden (C-38):
         // keine GER-Stufe, keine Punktzahl. Bei adaptiven Tests liegt die Quote
@@ -1365,7 +1624,7 @@
             p.bereich !== "H" && !p.richtig && p.stufe > finalLevelIndex).length;
         const geloestZeile = neueListe("Gelöst:");
         geloesteBereiche.length ? geloesteBereiche.forEach(geloestZeile) : geloestZeile("–");
-        const offenZeile = neueListe(`Nicht gelöst auf oder unter der ermittelten Stufe ${finalLevelName} (möglicher Förderbedarf):`);
+        const offenZeile = neueListe(`Noch nicht gelöst auf oder unter der ermittelten Stufe ${finalLevelName} – hier lohnt sich Übung (möglicher Förderbedarf):`);
         foerderBereiche.length ? foerderBereiche.forEach(offenZeile) : offenZeile("–");
         if (oberhalbNichtGeloest > 0) {
             const oberhalbHinweis = document.createElement("div");
@@ -1388,7 +1647,7 @@
         profilBox.appendChild(fussnote);
 
         // Kompaktes Profil und Antwortprotokoll für die Lehrkraft (Forms, optional)
-        const dauerMinuten = startZeit ? Math.round((Date.now() - startZeit) / 60000) : 0;
+        const dauerMinuten = startZeit ? Math.round((endZeit - startZeit) / 60000) : 0;
         const hinweise = [];
         if (!hoerteilAktiv) hinweise.push("ohne Hoerteil");
         if (alsTextGelesen) hinweise.push("Hoertexte als Text");
@@ -1442,23 +1701,30 @@
         ersatzLink.style.display = "inline-block";
         ersatzLink.onclick = () => {
             uebermittlungGeoeffnet = true;
+            speichereZwischenstand();
             document.getElementById("uebermittlung-status").textContent =
                 "Das Formular wurde in einem neuen Tab geöffnet. Klicke dort unten auf „Absenden“. Falls sich nichts geöffnet hat, klicke noch einmal auf den Button.";
         };
 
         document.querySelector("#result h2").setAttribute("tabindex", "-1");
         document.querySelector("#result h2").focus();
+        // Ergebnis sichern: Nach versehentlichem Neuladen kann es noch abgeschickt werden
+        speichereZwischenstand();
     }
 
     // ==== Initialisierung (am Skriptende, damit alle Konstanten definiert sind) ====
     // Umfangsangabe in der Einführung an den Modus anpassen (C-37)
     if (!hoerteilAktiv) {
         document.getElementById("intro-umfang").textContent =
-            `Du bearbeitest ${maxQuestions} Aufgaben: Lückensätze und 2 kurze Lesetexte mit je 3 Fragen. Das dauert etwa 25 Minuten.`;
+            `Du bearbeitest ${maxQuestions} Aufgaben: Lücken-Sätze und 2 kurze Texte zum Lesen.`;
+        document.getElementById("intro-umfang-en").textContent =
+            `You will answer ${maxQuestions} questions: gap sentences and 2 short reading texts.`;
     }
 
     // Prüfcode-Testansicht (C-28): ...index.html?pruefcode
-    if (new URLSearchParams(window.location.search).has("pruefcode")) {
+    if (!new URLSearchParams(window.location.search).has("pruefcode")) {
+        pruefeZwischenstand();
+    } else {
         document.getElementById("student-form").style.display = "none";
         document.getElementById("pruefcode-test").style.display = "block";
         document.getElementById("pc-datum").value = new Date().toLocaleDateString("de-DE");
