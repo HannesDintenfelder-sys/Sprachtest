@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Englisch-Einstufungstest (Orientierung: Grammatik, Wortschatz, Hörverstehen)</title>
+    <title>Englisch-Einstufungstest (Orientierung: Grammatik, Wortschatz, Lesen, Hören)</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -108,8 +108,56 @@
             box-sizing: border-box;
             font-size: 15px;
         }
-        #quiz, #result, #tontest, #beispiel, #pruefcode-test {
+        #quiz, #result, #tontest, #beispiel, #pruefcode-test, #fortsetzen {
             display: none;
+        }
+        /* Englische Zeile unter dem deutschen Arbeitsauftrag (für Lernende mit anderer Erstsprache) */
+        .auftrag-en {
+            display: block;
+            font-weight: normal;
+            color: #5a6a6b;
+            font-size: 13px;
+        }
+        .englisch-hilfe summary {
+            cursor: pointer;
+            font-weight: bold;
+            color: #34495e;
+            margin-top: 10px;
+        }
+        .englisch-hilfe summary:focus-visible {
+            outline: 3px solid #1a1a1a;
+            outline-offset: 2px;
+        }
+        /* Kurze Ermutigung zur Halbzeit */
+        .ermutigung {
+            background: #e7f4ec;
+            color: #1b5e37;
+            border-radius: 5px;
+            padding: 8px 12px;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        .ermutigung:empty {
+            display: none;
+        }
+        /* Lesetext mit begrenzter Höhe und eigener Bildlaufleiste */
+        .lesetext-box {
+            white-space: pre-line;
+            background: #ffffff;
+            border: 1px solid #7b8389;
+            border-radius: 4px;
+            padding: 12px 15px;
+            max-height: 40vh;
+            overflow-y: auto;
+            line-height: 1.5;
+            font-size: 16px;
+        }
+        .lesetext-box:focus-visible {
+            outline: 3px solid #1a1a1a;
+            outline-offset: 2px;
+        }
+        #lesetext-bereich {
+            margin-bottom: 15px;
         }
         #student-form {
             display: block;
@@ -236,21 +284,41 @@
 <body>
 
 <main id="quiz-container">
+    <!-- Schritt 0: Unterbrochenen Test fortsetzen (nur nach Neuladen im selben Tab) -->
+    <div id="fortsetzen">
+        <h2>Test fortsetzen?</h2>
+        <p id="fortsetzen-text"></p>
+        <button type="button" id="fortsetzen-ja" class="action-btn start-btn">Weitermachen</button>
+        <button type="button" id="fortsetzen-nein" class="action-btn secondary-btn">Neu beginnen</button>
+    </div>
+
     <!-- Schritt 1: Schülerdaten erfassen -->
     <div id="student-form">
         <h2>Englisch-Einstufungstest</h2>
-        <!-- Einführung (C-37) -->
+        <!-- Einführung in einfacher Sprache, zusätzlich auf Englisch -->
         <div class="result-box" style="margin-bottom: 20px;">
             <strong>So funktioniert der Test</strong>
             <ul>
-                <li id="intro-umfang">Du bearbeitest 25 Aufgaben, davon 4 Höraufgaben. Dafür brauchst du Kopfhörer. Das dauert etwa 20 Minuten.</li>
-                <li>Die Aufgaben passen sich an dich an: Sie werden schwerer oder leichter. Das ist normal.</li>
-                <li>Du kannst nicht zurückgehen.</li>
-                <li>Wenn du eine Vermutung hast, wähle sie. Wenn du gar keine Idee hast, wähle „Ich weiß es nicht“.</li>
-                <li>Der Test wird nicht benotet. Er hilft deiner Lehrkraft, den Unterricht passend zu planen.</li>
+                <li id="intro-umfang">Du bearbeitest 31 Aufgaben: Lücken-Sätze, 2 kurze Texte zum Lesen und 4 Aufgaben zum Hören. Für das Hören brauchst du Kopfhörer.</li>
+                <li><strong>Es gibt kein Zeitlimit.</strong> Die meisten brauchen etwa 30 Minuten.</li>
+                <li>Die Aufgaben passen sich an dich an. Sie werden schwerer oder leichter. Das ist normal.</li>
+                <li>Du kannst nicht zurückgehen. Lies jede Aufgabe in Ruhe.</li>
+                <li>Du weißt die Antwort ungefähr? Dann wähle sie. Du hast gar keine Idee? Dann wähle „Ich weiß es nicht“.</li>
+                <li>Der Test ist keine Prüfung und bekommt keine Note. Er hilft deiner Lehrkraft, den Unterricht gut zu planen.</li>
             </ul>
+            <details class="englisch-hilfe" lang="en">
+                <summary>Instructions in English</summary>
+                <ul>
+                    <li id="intro-umfang-en">You will answer 31 questions: gap sentences, 2 short reading texts and 4 listening tasks. You need headphones for the listening tasks.</li>
+                    <li><strong>There is no time limit.</strong> Most people need about 30 minutes.</li>
+                    <li>The questions adapt to you. They get harder or easier. This is normal.</li>
+                    <li>You cannot go back. Take your time with each question.</li>
+                    <li>If you roughly know the answer, choose it. If you have no idea at all, choose <span lang="de">„Ich weiß es nicht“</span> (I don't know).</li>
+                    <li>This is not an exam and there is no mark. It helps your teacher to plan the lessons.</li>
+                </ul>
+            </details>
         </div>
-        <p style="text-align: center; color: #5a6a6b; margin-bottom: 25px;">Bitte gib deine Daten ein, um den Test zu starten.</p>
+        <p style="text-align: center; color: #5a6a6b; margin-bottom: 25px;">Bitte gib deinen Namen und deine Klasse ein.</p>
 
         <div class="form-group">
             <label for="student-name">Vor- und Nachname:</label>
@@ -268,7 +336,7 @@
     <div id="beispiel">
         <h2>Beispielaufgabe</h2>
         <p class="klein" style="text-align: center;">So sehen die Aufgaben aus. Diese Aufgabe zählt nicht.</p>
-        <div class="arbeitsauftrag">Wähle die passende Lösung für die Lücke.</div>
+        <div class="arbeitsauftrag">Wähle die passende Lösung für die Lücke.<span class="auftrag-en" lang="en">Choose the answer that fits the gap.</span></div>
         <div class="question-box" id="beispiel-frage" lang="en">My name _____ Anna.</div>
         <fieldset id="beispiel-optionen" aria-describedby="beispiel-frage" style="border: none; margin: 0; padding: 0; min-width: 0;">
             <legend class="sr-only">Antwortmöglichkeiten</legend>
@@ -285,7 +353,7 @@
     <!-- Schritt 1b: Tontest vor den Höraufgaben (gleiche Hörbedingungen für alle) -->
     <div id="tontest">
         <h2>Vorbereitung: Tontest</h2>
-        <p id="tontest-text">Im Test kommen 4 Höraufgaben vor. Bitte setze jetzt Kopfhörer auf und klicke auf „Probe abspielen“. Du hörst einen kurzen englischen Satz.</p>
+        <p id="tontest-text">Im Test gibt es 4 Aufgaben zum Hören. Setz jetzt bitte deine Kopfhörer auf. Klicke dann auf „Probe abspielen“. Du hörst einen kurzen Satz auf Englisch.</p>
         <div style="text-align: center;">
             <button type="button" id="tontest-play" class="action-btn audio-btn"><span aria-hidden="true">🔊 </span>Probe abspielen</button>
         </div>
@@ -293,8 +361,8 @@
         <button type="button" id="tontest-ok" class="action-btn start-btn">Ich habe den Satz gut gehört – Test starten</button>
         <button type="button" id="tontest-problem" class="action-btn secondary-btn">Ich höre nichts oder nur schlecht</button>
         <div id="tontest-problem-box" style="display: none;">
-            <p class="klein">Bitte melde dich bei deiner Lehrkraft und prüft gemeinsam Lautstärke und Kopfhörer. Danach kannst du die Probe erneut abspielen.</p>
-            <p class="klein">Nur nach Rücksprache mit der Lehrkraft: Du kannst den Test auch ohne Ton starten. Die Hörtexte werden dann als Text angezeigt. Das wird im Ergebnis vermerkt.</p>
+            <p class="klein">Melde dich bei deiner Lehrkraft. Prüft zusammen die Lautstärke und die Kopfhörer. Dann kannst du die Probe noch einmal abspielen.</p>
+            <p class="klein">Frag zuerst deine Lehrkraft: Wenn sie zustimmt, kannst du auch ohne Ton starten. Dann siehst du die Hörtexte als Text. Deine Lehrkraft sieht das im Ergebnis.</p>
             <button type="button" id="tontest-text-start" class="action-btn secondary-btn">Ohne Ton starten (Hörtexte als Text)</button>
         </div>
     </div>
@@ -303,22 +371,28 @@
     <div id="quiz">
         <h2 id="quiz-title">Sprachtest</h2>
         <div id="frage-kopf" tabindex="-1">
-            <div id="progress">Frage 1 von 25</div>
+            <div id="progress"></div>
+            <div id="ermutigung" class="ermutigung" role="status"></div>
+            <div id="arbeitsauftrag" class="arbeitsauftrag"></div>
+            <div id="question-text" class="question-box" lang="en"></div>
 
-            <!-- Audio-Bereich für Hörverstehens-Aufgaben -->
+            <!-- Audio-Bereich für Hörverstehens-Aufgaben: nach der Frage (erst lesen, dann hören) -->
             <div id="audio-container" style="display: none; margin-bottom: 15px; text-align: center;">
                 <button type="button" id="play-audio-btn" class="action-btn audio-btn">
                     <span aria-hidden="true">🔊 </span><span id="play-audio-label">Hörtext abspielen</span>
                 </button>
-                <div id="audio-hinweis" class="klein" style="white-space: pre-line;">Klicke auf den Button, um die englische Sprachausgabe zu hören.</div>
+                <div id="audio-hinweis" class="klein" style="white-space: pre-line;"></div>
             </div>
-
-            <div id="arbeitsauftrag" class="arbeitsauftrag"></div>
-            <div id="question-text" class="question-box" lang="en">Lade Frage...</div>
+        </div>
+        <!-- Lesetext in eigenem Kasten mit begrenzter Höhe: Frage, Text und Antworten
+             passen so auch auf dem Smartphone zusammen auf den Bildschirm -->
+        <div id="lesetext-bereich" style="display: none;">
+            <div id="lesetext" class="lesetext-box" lang="en" tabindex="0" role="region" aria-label="Lesetext"></div>
+            <div id="lesetext-scrollhinweis" class="klein"></div>
         </div>
         <fieldset id="options" aria-describedby="question-text"></fieldset>
         <button type="button" id="weiter-btn" class="action-btn" onclick="handleAnswer()" disabled>Weiter</button>
-        <div class="klein" style="text-align: center;">Wähle eine Antwort und klicke dann auf „Weiter“. Zurückgehen ist nicht möglich.</div>
+        <div class="klein" style="text-align: center;">Wähle eine Antwort. Klicke dann auf „Weiter“. Zurückgehen ist nicht möglich.</div>
     </div>
 
     <!-- Schritt 3: Ergebnis & Anzeige -->
@@ -329,10 +403,12 @@
         <p id="danke-text" style="font-size: 15px; line-height: 1.5;"></p>
 
         <div class="hinweis-box">
-            Wichtig: Dein Ergebnis ist erst bei deiner Lehrkraft, wenn du es abschickst.<br>
-            1. Klicke auf „Ergebnis an Lehrkraft senden“. Das Formular öffnet sich in einem neuen Tab.<br>
-            2. Klicke im Formular ganz unten auf „Absenden“.
+            Wichtig: Deine Lehrkraft bekommt dein Ergebnis erst, wenn du es abschickst.<br>
+            1. Klicke auf „Ergebnis an Lehrkraft senden“. Das Formular öffnet sich in einem neuen Fenster.<br>
+            2. Ändere im Formular nichts. Klicke ganz unten auf „Absenden“.
         </div>
+        <!-- Einordnung der vorausgefüllten Formularfelder (Niveau, Punkte) für die Lernenden -->
+        <p class="klein" id="formular-hinweis">Im Formular stehen schon Angaben für deine Lehrkraft, zum Beispiel ein Niveau und eine Punktzahl. Das ist keine Note. Die Punktzahl hängt davon ab, welche Aufgaben du bekommen hast, und lässt sich nicht mit anderen vergleichen. Deine Lehrkraft bespricht das Ergebnis mit dir.</p>
         <div style="text-align: center;">
             <a id="manual-forms-link" href="#" target="_blank" rel="noopener" class="action-btn start-btn" style="display: none; width: auto; text-decoration: none;">
                 Ergebnis an Lehrkraft senden
@@ -343,6 +419,7 @@
         <!-- Ergebnis für die Lehrkraft (C-38): standardmäßig eingeklappt -->
         <details id="lehrkraft-details">
             <summary>Ergebnis für die Lehrkraft</summary>
+            <p class="klein">Dieser Bereich ist für deine Lehrkraft. Die Angaben sind Hinweise für die Unterrichtsplanung, keine Note.</p>
             <div style="text-align: center;">
                 <div id="level-badge" class="level-badge"></div>
                 <div id="level-band" style="margin-top: 10px; font-weight: bold;"></div>
@@ -382,7 +459,7 @@
     // Pflege der Aufgaben erschweren.
     const questionBank = [
         [ // Level 0: A1
-            { id: "A1-H1", konstrukt: "Hörverstehen", bereich: "H", q: "Listen to the announcement.\n\nQuestion: What time does the train leave?", audioText: "Attention please. The train to Berlin leaves at three o'clock from platform two.", options: ["At 2 o'clock", "At 3 o'clock", "At 4 o'clock", "At 10 o'clock"], answer: 1 },
+            { id: "A1-H1", konstrukt: "Hörverstehen", bereich: "H", q: "Listen to the announcement.\n\nQuestion: What time does the train leave?", audioText: "Attention please. The train to Berlin leaves at three o'clock from platform two.", options: ["At 2 o'clock", "At 3 o'clock", "At 4 o'clock", "At half past three"], answer: 1 },
             { id: "A1-H2", konstrukt: "Hörverstehen", bereich: "H", q: "Listen to the phone message.\n\nQuestion: What is Tom's phone number?", audioText: "Hello, my name is Tom. My phone number is zero, seven, nine, four, two, six, one. Please call me back.", options: ["0794261", "0794162", "0784261", "0694261"], answer: 0 },
             { id: "A1-H3", konstrukt: "Hörverstehen", bereich: "H", q: "Listen to the order in a café.\n\nQuestion: What does the customer order?", audioText: "Good morning. I would like a large black coffee and a croissant, please.", options: ["Tea and cake", "A small milk coffee", "A large black coffee and a croissant", "Water and a sandwich"], answer: 2 },
             { id: "A1-01", konstrukt: "to be", bereich: "G", q: "I _____ from Germany.", options: ["is", "am", "are", "be"], answer: 1 },
@@ -393,29 +470,28 @@
             { id: "A1-06", konstrukt: "Präpositionen der Zeit", bereich: "W", q: "The shop opens _____ 9 o'clock.", options: ["in", "on", "at", "to"], answer: 2 },
             { id: "A1-07", konstrukt: "Verneinung mit do/does", bereich: "G", q: "He _____ not like drinking coffee.", options: ["do", "does", "is", "are"], answer: 1 },
             { id: "A1-08", konstrukt: "Höfliche Fragen (would)", bereich: "G", q: "_____ you like an apple?", options: ["Would", "Are", "Does", "Have"], answer: 0 },
-            { id: "A1-09", konstrukt: "Pronomen", bereich: "G", q: "This backpack is _____.", options: ["mine", "my", "me", "I"], answer: 0 },
+            { id: "A1-09", konstrukt: "Pronomen", bereich: "G", q: "This backpack is _____.", options: ["mine", "my", "me", "mines"], answer: 0 },
             { id: "A1-10", konstrukt: "Fragewörter", bereich: "G", q: "_____ old are you?", options: ["How", "What", "Who", "Which"], answer: 0 },
             { id: "A1-11", konstrukt: "Present Simple", bereich: "G", q: "I usually _____ up at 7 a.m.", options: ["get", "gets", "getting", "got"], answer: 0 },
             { id: "A1-12", konstrukt: "to be", bereich: "G", q: "They _____ from Spain. They are from Italy.", options: ["doesn't", "don't", "aren't", "isn't"], answer: 2 },
-            { id: "A1-13", konstrukt: "Verstärkende Adverbien", bereich: "W", q: "The weather today is _____ nice.", options: ["much", "very", "many", "lot"], answer: 1 },
+            { id: "A1-13", konstrukt: "Verstärkende Adverbien", bereich: "W", q: "The weather today is _____ nice.", options: ["much", "very", "many", "a lot"], answer: 1 },
             { id: "A1-14", konstrukt: "Häufigkeitsadverbien", bereich: "G", q: "My brother _____ eats fish.", options: ["never", "don't", "not", "isn't"], answer: 0 },
             { id: "A1-15", konstrukt: "Imperativ", bereich: "G", q: "Please _____ the window. It's cold.", options: ["closes", "closing", "close", "closed"], answer: 2 },
-            { id: "A1-16", konstrukt: "Present Simple", bereich: "G", q: "The nurses _____ a break at 10 a.m.", options: ["have", "has", "having", "haves"], answer: 0 },
+            { id: "A1-16", konstrukt: "Present Simple", bereich: "G", q: "The nurses _____ a break at 10 a.m.", options: ["have", "has", "having", "does have"], answer: 0 },
             // Korrigiert (C-12): vorher waren "on" und "under" ebenfalls richtig
             { id: "A1-17", konstrukt: "Präpositionen des Ortes", bereich: "W", q: "I can't find my book. – Look, it's _____ your bag!", options: ["in", "of", "at", "to"], answer: 0 },
             { id: "A1-18", konstrukt: "Fragewörter", bereich: "G", q: "_____ are you from?", options: ["Where", "What", "Who", "When"], answer: 0 },
-            { id: "A1-19", konstrukt: "Verneinung mit do/does", bereich: "G", q: "I don't _____ a car.", options: ["have", "has", "having", "had"], answer: 0 },
-            { id: "A1-20", konstrukt: "Leseverstehen", bereich: "L", q: "Read the text.\n\"My favourite colour is blue. I wear a blue shirt every Friday.\"\n\nQuestion: What does the writer wear on Fridays?", options: ["A blue shirt", "A red hat", "Blue shoes", "Green trousers"], answer: 0 }
+            { id: "A1-19", konstrukt: "Verneinung mit do/does", bereich: "G", q: "I don't _____ a car.", options: ["have", "has", "having", "had"], answer: 0 }
         ],
         [ // Level 1: A2
             { id: "A2-H1", konstrukt: "Hörverstehen", bereich: "H", q: "Listen to the message from the doctor's surgery.\n\nQuestion: When is the new appointment?", audioText: "Hello Mr Bauer. This is Dr Smith's surgery. We need to move your appointment from Tuesday to Thursday at 10 a.m.", options: ["Tuesday at 10 a.m.", "Thursday at 10 a.m.", "Friday at 9 a.m.", "Monday at 10 a.m."], answer: 1 },
-            { id: "A2-H2", konstrukt: "Hörverstehen", bereich: "H", q: "Listen to the weather forecast.\n\nQuestion: What will the weather be like in the late afternoon?", audioText: "Good morning! Today will start sunny, but expect heavy rain and strong winds in the late afternoon.", options: ["Sunny and warm", "Snowy and cold", "Heavy rain and strong winds", "Cloudy without rain"], answer: 2 },
-            { id: "A2-H3", konstrukt: "Hörverstehen", bereich: "H", q: "Listen to the shop announcement.\n\nQuestion: What are shoppers asked to do?", audioText: "Attention, shoppers. Our shop will close in fifteen minutes. Please bring your purchases to the checkouts at the front.", options: ["Leave without paying", "Go to the checkouts at the front", "Visit the second floor", "Wait for thirty minutes"], answer: 1 },
+            { id: "A2-H2", konstrukt: "Hörverstehen", bereich: "H", q: "Listen to the weather forecast.\n\nQuestion: What will the weather be like in the late afternoon?", audioText: "Good morning! Today will start sunny, but expect heavy rain and strong winds in the late afternoon.", options: ["Sunny and warm", "Sunny but windy", "Heavy rain and strong winds", "Cloudy without rain"], answer: 2 },
+            { id: "A2-H3", konstrukt: "Hörverstehen", bereich: "H", q: "Listen to the shop announcement.\n\nQuestion: What are shoppers asked to do?", audioText: "Attention, shoppers. Our shop will close in fifteen minutes. Please bring your purchases to the checkouts at the front.", options: ["Leave the shop immediately", "Go to the checkouts at the front", "Visit the second floor", "Wait for fifteen minutes"], answer: 1 },
             { id: "A2-01", konstrukt: "Past Simple", bereich: "G", q: "I _____ my homework yesterday evening.", options: ["do", "did", "done", "doing"], answer: 1 },
             { id: "A2-02", konstrukt: "Past Simple: Fragen und Verneinung", bereich: "G", q: "Did you _____ the new film last night?", options: ["watch", "watched", "watches", "watching"], answer: 0 },
             { id: "A2-03", konstrukt: "Steigerung", bereich: "G", q: "My house is _____ than yours.", options: ["big", "bigger", "biggest", "more big"], answer: 1 },
             { id: "A2-04", konstrukt: "some/any", bereich: "G", q: "There aren't _____ apples left in the basket.", options: ["some", "any", "no", "much"], answer: 1 },
-            { id: "A2-05", konstrukt: "Past Simple (unregelmäßige Verben)", bereich: "G", q: "They _____ to London last summer.", options: ["go", "went", "goed", "gone"], answer: 1 },
+            { id: "A2-05", konstrukt: "Past Simple (unregelmäßige Verben)", bereich: "G", q: "They _____ to London last summer.", options: ["go", "went", "have gone", "gone"], answer: 1 },
             { id: "A2-06", konstrukt: "Steigerung", bereich: "G", q: "She is the _____ student in the classroom.", options: ["tall", "taller", "tallest", "more tall"], answer: 2 },
             { id: "A2-07", konstrukt: "Past Simple: Fragen und Verneinung", bereich: "G", q: "Did he _____ his car last week?", options: ["sell", "sold", "selling", "sells"], answer: 0 },
             // Korrigiert (C-16): vorher war "until" ebenfalls richtig
@@ -442,7 +518,7 @@
             { id: "B1-01", konstrukt: "Gerundium nach Präposition", bereich: "G", q: "Dear Ms Lee, thank you for your offer. I am looking forward _____ from you.", options: ["to hear", "hear", "to hearing", "hearing"], answer: 2 },
             { id: "B1-02", konstrukt: "Present Perfect (since/for)", bereich: "G", q: "She _____ in this town for ten years.", options: ["live", "lives", "is living", "has lived"], answer: 3 },
             { id: "B1-03", konstrukt: "Indirekte Fragen", bereich: "G", q: "Excuse me, could you tell me where _____? – Yes, it's on the second floor.", options: ["is the reception", "the reception is", "is reception", "reception is"], answer: 1 },
-            { id: "B1-04", konstrukt: "Adjektive auf -ed/-ing", bereich: "W", q: "I was very _____ when I heard the good news.", options: ["excited", "exciting", "excite", "excites"], answer: 0 },
+            { id: "B1-04", konstrukt: "Adjektive auf -ed/-ing", bereich: "W", q: "I was very _____ when I heard the good news.", options: ["excited", "exciting", "excite", "excitement"], answer: 0 },
             { id: "B1-05", konstrukt: "Passiv (Vergangenheit)", bereich: "G", q: "The window _____ broken by the children.", options: ["are", "were", "was", "have been"], answer: 2 },
             // Korrigiert (C-15): Kontext ergänzt, vorher waren "mustn't" und "shouldn't" ebenfalls vertretbar
             { id: "B1-06", konstrukt: "Modalverben (mustn't/don't have to)", bereich: "G", q: "Uniforms are optional at our school, so you _____ wear one.", options: ["mustn't", "don't have to", "have to", "haven't to"], answer: 1 },
@@ -501,8 +577,8 @@
             // Korrigiert (C-17): "is" ist im britischen Englisch ebenfalls richtig und wurde entfernt
             { id: "C1-02", konstrukt: "Konjunktiv (subjunctive)", bereich: "G", q: "It is vital that the truth _____ revealed.", options: ["be", "being", "to be", "been"], answer: 0 },
             { id: "C1-03", konstrukt: "Bedingungssatz Typ 3", bereich: "G", q: "Had I known about the danger, I _____ there.", options: ["would not go", "will not go", "did not go", "would not have gone"], answer: 3 },
-            { id: "C1-04", konstrukt: "Phrasal Verbs", bereich: "W", q: "We must _____ the underlying causes of the conflict.", options: ["look up", "look into", "look over", "look after"], answer: 1 },
-            { id: "C1-05", konstrukt: "Bedingungssatz ohne if", bereich: "G", q: "Should you _____ any questions about your appointment, please contact our reception.", options: ["need", "requiring", "have", "required"], answer: 2 },
+            { id: "C1-04", konstrukt: "Phrasal Verbs", bereich: "W", q: "We must _____ the underlying causes of the conflict.", options: ["look up", "look into", "look out", "look after"], answer: 1 },
+            { id: "C1-05", konstrukt: "Bedingungssatz ohne if", bereich: "G", q: "Should you _____ any questions about your appointment, please contact our reception.", options: ["need", "had", "have", "having"], answer: 2 },
             { id: "C1-06", konstrukt: "would rather / it's time + Vergangenheit", bereich: "G", q: "I'd rather you _____ smoke in this room.", options: ["didn't", "haven't", "won't", "doesn't"], answer: 0 },
             { id: "C1-07", konstrukt: "would rather / it's time + Vergangenheit", bereich: "G", q: "It's high time we _____ our lifestyle.", options: ["change", "changing", "changed", "have changed"], answer: 2 },
             { id: "C1-08", konstrukt: "Phrasal Verbs", bereich: "W", q: "She takes _____ her mother in both looks and temperament.", options: ["after", "over", "up", "on"], answer: 0 },
@@ -537,13 +613,13 @@
             { id: "C2-08", konstrukt: "Kollokationen", bereich: "W", q: "The new regulations will inevitably _____ a heavy toll on small shops.", options: ["take", "make", "have", "do"], answer: 0 },
             // Korrigiert (C-18): "of" ist ebenfalls richtig und wurde entfernt
             { id: "C2-09", konstrukt: "Präpositionen nach Nomen", bereich: "W", q: "She has a natural knack _____ picking up languages.", options: ["for", "on", "about", "by"], answer: 0 },
-            { id: "C2-10", konstrukt: "Kollokationen", bereich: "W", q: "After hours of talks, the negotiations ground to a _____.", options: ["halt", "stop", "end", "close"], answer: 0 },
+            { id: "C2-10", konstrukt: "Kollokationen", bereich: "W", q: "After hours of talks, the negotiations ground to a _____.", options: ["halt", "pause", "end", "close"], answer: 0 },
             { id: "C2-11", konstrukt: "Phrasal Verbs", bereich: "W", q: "Their savings were slowly whittled _____ by rising costs.", options: ["away", "off", "out", "over"], answer: 0 },
             { id: "C2-12", konstrukt: "Feste Wendungen", bereich: "W", q: "He loves playing devil's _____ during discussions.", options: ["advocate", "lawyer", "representative", "proxy"], answer: 0 },
-            { id: "C2-13", konstrukt: "Wortschatz (Adjektive)", bereich: "W", q: "His behaviour was completely _____, leaving everyone in shock.", options: ["reprehensible", "respectful", "receptive", "reluctant"], answer: 0 },
-            { id: "C2-14", konstrukt: "Phrasal Verbs", bereich: "W", q: "The politician managed to skirt _____ the issue.", options: ["around", "over", "through", "off"], answer: 0 },
+            { id: "C2-13", konstrukt: "Wortschatz (Adjektive)", bereich: "W", q: "His behaviour was completely _____, leaving everyone in shock.", options: ["reprehensible", "apprehensive", "comprehensible", "reproducible"], answer: 0 },
+            { id: "C2-14", konstrukt: "Phrasal Verbs", bereich: "W", q: "The politician managed to skirt _____ the issue.", options: ["around", "into", "through", "off"], answer: 0 },
             { id: "C2-15", konstrukt: "Feste Wendungen", bereich: "W", q: "His comments were completely _____ the mark.", options: ["off", "out", "beyond", "below"], answer: 0 },
-            { id: "C2-16", konstrukt: "Kollokationen", bereich: "W", q: "She bears a _____ resemblance to her grandmother.", options: ["striking", "hitting", "punching", "smacking"], answer: 0 },
+            { id: "C2-16", konstrukt: "Kollokationen", bereich: "W", q: "She bears a _____ resemblance to her grandmother.", options: ["striking", "heavy", "deep", "tight"], answer: 0 },
             // Neu (C-08): ersetzen die nach B2/C1 verschobenen Aufgaben, damit der C2-Pool ausreicht
             { id: "C2-17", konstrukt: "Bedingungssatz ohne if", bereich: "G", q: "_____ it not been for her quick thinking, the situation could have ended in disaster.", options: ["Had", "Were", "Should", "Did"], answer: 0 },
             { id: "C2-18", konstrukt: "Kollokationen", bereich: "W", q: "The scandal dealt a severe _____ to the minister's reputation.", options: ["blow", "hit", "strike", "punch"], answer: 0 },
@@ -552,14 +628,113 @@
         ]
     ];
 
+    // Lesetexte: Jede Person bearbeitet 2 Texte mit je 3 Fragen (A1 bis C2, je
+    // Stufe mindestens ein Text, ab A2 je zwei). Der erste Text wird passend zum
+    // laufenden Grammatik/Wortschatz-Schätzwert gewählt, der zweite nach dem
+    // Ergebnis des ersten (siehe loadNextQuestion). Die Antworten verändern die
+    // adaptive Stufe nicht und werden als eigener Bereich "Leseverstehen"
+    // ausgewiesen. Kontexte: Alltag, Büro/Handel, Gesundheit.
+    const lesetexte = [
+        { id: "L-A1", stufe: 0, titel: "A note on the fridge",
+          text: "Hi Tom,\nI am at the doctor's at 3 o'clock. Please feed the cat at 5. The cat food is in the kitchen, next to the fridge. See you at 7!\nMia",
+          fragen: [
+            { id: "L-A1-1", konstrukt: "Leseverstehen (Detail)", q: "Where is Mia at 3 o'clock?", options: ["At the doctor's", "In the kitchen", "At work", "At the shop"], answer: 0 },
+            { id: "L-A1-2", konstrukt: "Leseverstehen (Detail)", q: "What does Mia ask Tom to do?", options: ["Feed the cat at 5", "Go to the doctor at 3", "Buy cat food", "Call her at 7"], answer: 0 },
+            { id: "L-A1-3", konstrukt: "Leseverstehen (Detail)", q: "Where is the cat food?", options: ["Next to the fridge", "In the fridge", "At the doctor's", "On the table"], answer: 0 }
+          ] },
+        { id: "L-A2a", stufe: 1, titel: "E-mail from a supplier",
+          text: "Dear Mr Becker,\nThank you for your order of 20 office chairs. Unfortunately, the black chairs are not available at the moment. We can deliver grey chairs next Monday, or black chairs in three weeks. The price is the same. Please tell us which you prefer by Friday.\nKind regards,\nLisa Hall, Office World",
+          fragen: [
+            { id: "L-A2a-1", konstrukt: "Leseverstehen (Hauptaussage)", q: "Why is Lisa writing to Mr Becker?", options: ["To explain a problem with his order", "To ask him to pay for the chairs", "To offer him cheaper chairs", "To cancel his order"], answer: 0 },
+            { id: "L-A2a-2", konstrukt: "Leseverstehen (Detail)", q: "When can the grey chairs arrive?", options: ["Next Monday", "In three weeks", "On Friday", "Today"], answer: 0 },
+            { id: "L-A2a-3", konstrukt: "Leseverstehen (Detail)", q: "What should Mr Becker do?", options: ["Choose a colour by Friday", "Pay more for the black chairs", "Call the shop on Monday", "Send the chairs back"], answer: 0 }
+          ] },
+        { id: "L-A2b", stufe: 1, titel: "Westfield Medical Practice – information for patients",
+          text: "From 1 March, our opening hours change. We are open Monday to Friday from 8 a.m. to 6 p.m. On Wednesday afternoons the practice is closed. Please book appointments online or by phone. Bring your health insurance card to every appointment.",
+          fragen: [
+            { id: "L-A2b-1", konstrukt: "Leseverstehen (Detail)", q: "When is the practice closed?", options: ["On Wednesday afternoons", "On Monday mornings", "Every day after 5 p.m.", "On Fridays"], answer: 0 },
+            { id: "L-A2b-2", konstrukt: "Leseverstehen (Detail)", q: "How can patients book an appointment?", options: ["Online or by phone", "Only at the reception", "Only by e-mail", "By letter"], answer: 0 },
+            { id: "L-A2b-3", konstrukt: "Leseverstehen (Detail)", q: "What must patients bring to every appointment?", options: ["Their health insurance card", "A letter from another doctor", "Their passport", "Money for the appointment"], answer: 0 }
+          ] },
+        { id: "L-B1a", stufe: 2, titel: "A customer complaint",
+          text: "Dear Sir or Madam,\nOn 12 May I ordered a coffee machine from your online shop (order no. 4471). It arrived on time, but after only two days it stopped working. I have called your hotline twice, but nobody answered. I would like you to send me a new machine as soon as possible. If this is not possible, I would like my money back. I have attached a photo of the receipt.\nYours faithfully,\nDaniel Kraus",
+          fragen: [
+            { id: "L-B1a-1", konstrukt: "Leseverstehen (Hauptaussage)", q: "What is Daniel's main problem?", options: ["The machine broke shortly after it arrived", "The machine was delivered late", "He received the wrong machine", "The machine was too expensive"], answer: 0 },
+            { id: "L-B1a-2", konstrukt: "Leseverstehen (Detail)", q: "Why is Daniel writing instead of phoning?", options: ["Nobody answered the hotline", "Calling the hotline was too expensive", "He prefers writing e-mails", "He lost the phone number"], answer: 0 },
+            { id: "L-B1a-3", konstrukt: "Leseverstehen (Detail)", q: "What does Daniel want first?", options: ["A replacement machine", "His money back", "A discount on his next order", "A visit from a technician"], answer: 0 }
+          ] },
+        { id: "L-B1b", stufe: 2, titel: "Taking your new medicine",
+          text: "Take one tablet twice a day, in the morning and in the evening, with a meal. Do not take more than two tablets in 24 hours. Some patients feel tired during the first week; this usually stops after a few days. Do not drive if you feel tired. If you get a skin rash, stop taking the tablets and contact your doctor immediately.",
+          fragen: [
+            { id: "L-B1b-1", konstrukt: "Leseverstehen (Detail)", q: "How should patients take the tablets?", options: ["With food, in the morning and in the evening", "Only before going to bed", "Three times a day without food", "Only when they feel ill"], answer: 0 },
+            { id: "L-B1b-2", konstrukt: "Leseverstehen (Detail)", q: "What does the leaflet say about feeling tired?", options: ["It can happen at first and usually goes away", "It means the patient must see a doctor", "It only happens after several weeks", "It is a reason to take more tablets"], answer: 0 },
+            { id: "L-B1b-3", konstrukt: "Leseverstehen (Detail)", q: "What should a patient do if they get a skin rash?", options: ["Stop the medicine and contact the doctor", "Take only one tablet a day", "Wait a few days until it stops", "Avoid driving"], answer: 0 }
+          ] },
+        { id: "L-B2a", stufe: 3, titel: "The four-day week: a success?",
+          text: "Last year, 60 companies in the UK tested a four-day working week without cutting salaries. According to the organisers, most firms reported that productivity stayed the same or even improved, and the number of sick days fell considerably. However, not all businesses found the change easy. Companies with customer service departments, for example, had to reorganise shifts so that customers could still reach someone five days a week. Of the 60 companies, 56 decided to continue with the scheme, although several admitted that it had initially caused extra work for managers.",
+          fragen: [
+            { id: "L-B2a-1", konstrukt: "Leseverstehen (Hauptaussage)", q: "What was the main result of the trial?", options: ["Most companies did not lose productivity", "Most companies had to reduce salaries", "Employees took more sick days", "Customers complained about poor service"], answer: 0 },
+            { id: "L-B2a-2", konstrukt: "Leseverstehen (Detail)", q: "Which difficulty does the text mention?", options: ["Customer service had to be organised differently", "Managers refused to take part", "Productivity fell in small firms", "Staff wanted to return to a five-day week"], answer: 0 },
+            { id: "L-B2a-3", konstrukt: "Leseverstehen (Schlussfolgerung)", q: "Which statement is true according to the text?", options: ["Most firms kept the four-day week", "All firms stopped the trial after a year", "Only firms without customers took part", "Managers had less work at the beginning"], answer: 0 }
+          ] },
+        { id: "L-B2b", stufe: 3, titel: "Memo to all ward staff: new handover procedure",
+          text: "Following several incidents in which important information was not passed on between shifts, we will introduce a written handover form from next Monday. The form must be completed for every patient before the end of each shift and discussed briefly with the incoming nurse. We are aware that this will take additional time at first. Team leaders have therefore been asked to plan an extra fifteen minutes of overlap between shifts. Feedback on the form is welcome during the first month, after which it may be adapted.",
+          fragen: [
+            { id: "L-B2b-1", konstrukt: "Leseverstehen (Hauptaussage)", q: "Why is the new procedure being introduced?", options: ["Information has sometimes been lost between shifts", "Patients have complained about long waiting times", "There are not enough nurses on the ward", "The old forms were too long"], answer: 0 },
+            { id: "L-B2b-2", konstrukt: "Leseverstehen (Detail)", q: "How will staff get time for the handover?", options: ["Shifts will overlap by an extra fifteen minutes", "Nurses will work one extra day per month", "Team leaders will complete the forms", "The form will only be used at weekends"], answer: 0 },
+            { id: "L-B2b-3", konstrukt: "Leseverstehen (Schlussfolgerung)", q: "What does the memo say about the form itself?", options: ["It may be changed after staff have given feedback", "It replaces all other patient records", "It is only needed for new patients", "It must be sent to the team leader by e-mail"], answer: 0 }
+          ] },
+        { id: "L-C1a", stufe: 4, titel: "The office is dead – long live the office?",
+          text: "When the pandemic forced millions to work from home, many commentators predicted the end of the traditional office. Three years on, the picture is considerably more nuanced. Most large employers have settled on hybrid arrangements, yet attendance on the days staff are expected in remains stubbornly low. Managers complain that spontaneous exchanges – the overheard conversation that solves a problem, the quick question by the coffee machine – have all but disappeared. Employees, for their part, point out that commuting for an hour only to sit in video calls at a desk makes little sense. What both sides seem to agree on, albeit reluctantly, is that the office will survive only if it offers something that cannot be had at home. Simply ordering people back, it appears, is not enough.",
+          fragen: [
+            { id: "L-C1a-1", konstrukt: "Leseverstehen (Hauptaussage)", q: "What is the writer's main point?", options: ["Offices will only stay relevant if they offer something people cannot get at home", "The traditional office has completely disappeared", "Employers should order their staff back to the office full-time", "Hybrid working has solved the problems of working from home"], answer: 0 },
+            { id: "L-C1a-2", konstrukt: "Leseverstehen (Schlussfolgerung)", q: "Why do employees question going into the office?", options: ["They often spend the day doing what they could do at home", "They are no longer allowed to work from home", "The offices are too crowded on the fixed days", "Their managers rarely come in themselves"], answer: 0 },
+            { id: "L-C1a-3", konstrukt: "Leseverstehen (Wortschatz im Kontext)", q: "What does \"albeit reluctantly\" suggest about the agreement?", options: ["Both sides accept it, although they do not like it", "Both sides are enthusiastic about it", "Only the managers accept it", "The agreement is likely to change soon"], answer: 0 }
+          ] },
+        { id: "L-C1b", stufe: 4, titel: "Artificial intelligence in the radiology department",
+          text: "A recent study at a large teaching hospital found that an AI system detected early signs of breast cancer on mammograms about as reliably as experienced radiologists. Headlines were quick to suggest that machines might soon replace doctors. The researchers themselves, however, drew a far more cautious conclusion. The system performed best when its results were checked by a radiologist, and it produced a notable number of false alarms in women with dense breast tissue. Moreover, the study was carried out in a single hospital, so it remains unclear whether the results would hold elsewhere. The authors therefore recommend using the software as a \"second reader\" to support, rather than substitute, human judgement – at least until larger trials have been completed.",
+          fragen: [
+            { id: "L-C1b-1", konstrukt: "Leseverstehen (Hauptaussage)", q: "How do the researchers' conclusions differ from the headlines?", options: ["They see the AI system as support for doctors, not as a replacement", "They believe AI will replace radiologists sooner than expected", "They found the AI system unreliable in all cases", "They think the study proves that AI is better than doctors"], answer: 0 },
+            { id: "L-C1b-2", konstrukt: "Leseverstehen (Detail)", q: "Which limitation of the study is mentioned?", options: ["It was carried out in only one hospital", "Too few radiologists took part", "The AI system missed most of the cancers", "Many patients refused to take part"], answer: 0 },
+            { id: "L-C1b-3", konstrukt: "Leseverstehen (Schlussfolgerung)", q: "What does \"at least until larger trials have been completed\" imply?", options: ["The recommendation may change when more evidence is available", "Larger trials have already confirmed the results", "The software should not be used before then", "Radiologists will no longer be needed after the trials"], answer: 0 }
+          ] },
+        { id: "L-C2a", stufe: 5, titel: "Measuring what matters",
+          text: "There is a seductive logic to the idea that whatever can be measured can be improved. Call centres time their calls, hospitals count their waiting times, schools rank their pupils – and in each case the figures dutifully rise. Yet anyone who has been cut off by an agent racing to hit a target, or discharged a day too early to keep a ward's statistics respectable, will recognise the flaw. The moment a number becomes the goal rather than a rough indicator, people learn, quite rationally, to serve the number. None of this is an argument against measurement as such; it is an argument against mistaking the map for the territory. The irony is that the organisations most proud of their dashboards are often the least aware of what those dashboards have quietly ceased to show.",
+          fragen: [
+            { id: "L-C2a-1", konstrukt: "Leseverstehen (Haltung des Autors)", q: "What is the writer's central argument?", options: ["Targets distort behaviour once the number matters more than what it stands for", "Organisations should stop measuring their performance altogether", "Call centres and hospitals simply measure the wrong things", "Figures usually rise because organisations become more efficient"], answer: 0 },
+            { id: "L-C2a-2", konstrukt: "Leseverstehen (Wortschatz im Kontext)", q: "What does \"mistaking the map for the territory\" refer to?", options: ["Confusing an indicator with the reality it is meant to describe", "Using too many different measurements at the same time", "Failing to plan far enough ahead", "Measuring the performance of the wrong department"], answer: 0 },
+            { id: "L-C2a-3", konstrukt: "Leseverstehen (Schlussfolgerung)", q: "What is ironic, according to the last sentence?", options: ["Those who rely most on their figures may notice least what the figures hide", "Organisations with dashboards perform worse than those without", "Dashboards are usually too complicated to be understood", "Staff are proud of the dashboards, but managers are not"], answer: 0 }
+          ] },
+        { id: "L-C2b", stufe: 5, titel: "The limits of \"patient choice\"",
+          text: "Few political slogans are as difficult to argue with as \"patient choice\". Who, after all, would wish to deny people a say in their own treatment? And yet the phrase conceals as much as it reveals. Choice presupposes information, time and, not least, alternatives worth choosing between – conditions conspicuously absent for the elderly patient in a rural area served by a single overstretched clinic. For the articulate and well-connected, choice can indeed be empowering; for others, it risks becoming a polite way of shifting responsibility for failures of provision from the system to the individual. To criticise the rhetoric is not to dismiss the principle. It is merely to insist that a right one cannot exercise is, in practice, scarcely a right at all.",
+          fragen: [
+            { id: "L-C2b-1", konstrukt: "Leseverstehen (Haltung des Autors)", q: "What is the writer's attitude towards \"patient choice\"?", options: ["The principle is valuable but means little without the conditions to make it real", "Patients should not be allowed to make decisions about their treatment", "Patient choice works well for everyone as long as information is provided", "The slogan is mainly used by patients who want more services"], answer: 0 },
+            { id: "L-C2b-2", konstrukt: "Leseverstehen (Textabsicht)", q: "Why does the writer mention the elderly patient in a rural area?", options: ["To show someone who has a choice in theory but not in practice", "To prove that rural clinics provide poor treatment", "To argue that elderly patients do not want to make choices", "To show that choice matters more in rural areas"], answer: 0 },
+            { id: "L-C2b-3", konstrukt: "Leseverstehen (Schlussfolgerung)", q: "What risk does the writer see in the idea of choice?", options: ["It may shift the blame for poor services onto individual patients", "It may make treatment more expensive for the state", "It may leave doctors with too little influence", "It may confuse patients with too much information"], answer: 0 }
+          ] }
+    ];
+
+    // Wählt einen noch nicht bearbeiteten Lesetext möglichst nah an der Stufe
+    function waehleLesetext(stufe, benutzt) {
+        const ziel = stufe;
+        const frei = lesetexte.filter(t => !benutzt.has(t.id));
+        if (frei.length === 0) return lesetexte[0];
+        const abstand = Math.min(...frei.map(t => Math.abs(t.stufe - ziel)));
+        // bei gleichem Abstand den leichteren Text bevorzugen
+        const kandidaten = frei.filter(t => Math.abs(t.stufe - ziel) === abstand);
+        const minStufe = Math.min(...kandidaten.map(t => t.stufe));
+        const auswahl = kandidaten.filter(t => t.stufe === minStufe);
+        return auswahl[Math.floor(Math.random() * auswahl.length)];
+    }
+
     // Einstufung (C-01, C-02): nicht mehr über die Punktsumme, sondern über eine
-    // Fähigkeitsschätzung aus ALLEN Antworten des adaptiven Teils (Grammatik,
-    // Wortschatz, Lesen), wie bei adaptiven Tests üblich (Maximum-Likelihood mit
+    // Fähigkeitsschätzung aus allen Antworten des adaptiven Teils (nur Grammatik
+    // und Wortschatz), wie bei adaptiven Tests üblich (Maximum-Likelihood mit
     // Ratewahrscheinlichkeit 25 % und schwacher Vorannahme um B1).
     // Skala: 0 = A1, 1 = A2, ... 5 = C2. Ein Schätzwert von z. B. 2,4 heißt:
     // B1-Aufgaben werden überwiegend gelöst, B2-Aufgaben überwiegend noch nicht.
     // Aus dem Standardfehler ergibt sich ein Bereich (Schätzwert ± 1 Standardfehler).
-    // Höraufgaben werden getrennt ausgewiesen und fließen hier nicht ein.
+    // Lese- und Höraufgaben werden getrennt ausgewiesen und fließen hier nicht ein.
     const RATEWAHRSCHEINLICHKEIT = 0.25;
     const TRENNSCHAERFE = 2;
     const VORANNAHME_MITTEL = 2.5;  // Mitte von B1
@@ -578,7 +753,14 @@
         return Math.max(0, Math.min(levelNames.length - 1, Math.floor(wert)));
     }
 
-    // antworten: Array von { stufe, richtig } (nur adaptiver Teil, ohne Hören)
+    // "Ich weiß es nicht" wird mit Teilkredit gewertet (übliche Behandlung
+    // ausgelassener Antworten bei 4 Optionen): wie ein Viertel Treffer. So werden
+    // vorsichtige Lernende, die bei Unsicherheit nicht raten, nicht systematisch
+    // tiefer eingestuft als Lernende, die raten. Im Erwartungswert lohnt sich
+    // dadurch weder Raten noch "Ich weiß es nicht" taktisch.
+    const TEILKREDIT_WEISS_NICHT = RATEWAHRSCHEINLICHKEIT;
+
+    // antworten: Array von { stufe, richtig, weissNicht } (nur Grammatik/Wortschatz)
     function ermittleNiveau(antworten) {
         let theta = VORANNAHME_MITTEL;
         let besteLL = -Infinity;
@@ -587,7 +769,11 @@
             let ll = -((t - VORANNAHME_MITTEL) ** 2) / (2 * VORANNAHME_STREUUNG ** 2);
             for (const a of antworten) {
                 const p = loesungswahrscheinlichkeit(t, a.stufe);
-                ll += Math.log(a.richtig ? p : 1 - p);
+                if (a.weissNicht) {
+                    ll += TEILKREDIT_WEISS_NICHT * Math.log(p) + (1 - TEILKREDIT_WEISS_NICHT) * Math.log(1 - p);
+                } else {
+                    ll += Math.log(a.richtig ? p : 1 - p);
+                }
             }
             if (ll > besteLL) {
                 besteLL = ll;
@@ -658,13 +844,18 @@
     let studentData = { name: "", schoolClass: "", year: "" };
 
     // Nachteilsausgleich (C-26): Mit dem Link ...index.html?hoeren=aus läuft der
-    // Test ohne Höraufgaben (21 statt 25 Aufgaben). Den Link gibt die Lehrkraft
+    // Test ohne Höraufgaben (27 statt 31 Aufgaben). Den Link gibt die Lehrkraft
     // gezielt weiter; das wird im Ergebnis vermerkt.
     const hoerteilAktiv = new URLSearchParams(window.location.search).get("hoeren") !== "aus";
-    // Feste Positionen der 4 Höraufgaben (0-basiert = Fragen 5, 11, 17, 23), damit
-    // alle Lernenden gleich viele Höraufgaben bekommen (C-06)
-    const HOER_POSITIONEN = hoerteilAktiv ? [4, 10, 16, 22] : [];
-    const maxQuestions = hoerteilAktiv ? 25 : 21;
+    // Feste Positionen für Hör- und Lesefragen, damit alle Lernenden gleich viele
+    // davon bekommen (C-06).
+    // Ablauf (fest für alle): S = adaptive Aufgabe (Grammatik/Wortschatz),
+    // H = Höraufgabe, L = Frage zu einem Lesetext (3 Fragen je Text).
+    // Mit Hörteil: 21 S + 4 H + 6 L = 31 Aufgaben; ohne Hörteil: 21 S + 6 L = 27.
+    const ABLAUF = (hoerteilAktiv
+        ? "SSSSHSSSLLLSSHSSSSHSLLLSSSHSSSS"
+        : "SSSSSSSLLLSSSSSSSLLLSSSSSSS").split("");
+    const maxQuestions = ABLAUF.length;
     const MAX_WIEDERGABEN = 2;
 
     // Optional (C-05): ID einer zusätzlichen Forms-Frage vom Typ "Lange Antwort"
@@ -690,13 +881,17 @@
     let startZeit = null;
     const protokoll = []; // je Aufgabe: id, konstrukt, stufe, bereich, richtig, weissNicht, wiedergaben, alsText
     const benutzteKonstrukte = new Set();
+    const benutzteLesetexte = new Set();
+    let aktuellerLesetext = null;
+    let leseFrageIndex = 0;
 
     // "Ich weiß es nicht" (C-10): eigener Wert, wird als nicht gelöst gewertet
     const WEISS_NICHT = "weissnicht";
 
     // Mehrfachdurchläufe erkennbar machen (C-32): zufällige Durchlauf-ID und
     // Zähler der Versuche auf diesem Gerät (nur im Browser gespeichert)
-    const durchlaufId = Math.random().toString(36).slice(2, 8).toUpperCase();
+    let durchlaufId = Math.random().toString(36).slice(2, 8).toUpperCase();
+    let endZeit = null;
     let versuchAufGeraet = 1;
     let startUhrzeit = "";
 
@@ -714,12 +909,13 @@
         window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
     }
 
+    // Neutral formuliert: Die Texte stehen im Lehrkraft-Bereich, den auch Lernende aufklappen können
     const levelDescriptions = [
-        "Grundlegende Strukturen und Wörter (z. B. to be, einfache Fragen, Präsens, Zeitangaben) werden überwiegend erkannt. Für den Unterricht passt Material mit kurzen, einfachen Sätzen und viel Unterstützung.",
-        "Häufige Alltagsstrukturen (z. B. einfache Vergangenheit, Steigerung, Verlaufsform) werden überwiegend sicher erkannt. Für den Unterricht passen kurze, klar aufgebaute Texte mit Wortschatzhilfen.",
-        "Zentrale Strukturen der Mittelstufe (z. B. Present Perfect, Bedingungssätze, Passiv, indirekte Fragen) werden überwiegend sicher erkannt. Für den Unterricht passt alltagsnahes und berufsbezogenes Material mit gelegentlichen Hilfen.",
-        "Auch anspruchsvollere Strukturen (z. B. Past Perfect, Future Perfect, Gerundium und Infinitiv, Phrasal Verbs) werden überwiegend sicher erkannt. Für den Unterricht passt authentisches Material mit vertiefenden Zusatzaufgaben.",
-        "Auch seltenere und gehobene Strukturen (z. B. Inversion, Konjunktiv, feste Wendungen) werden überwiegend sicher erkannt. Anspruchsvolle Erweiterungsaufgaben sind sinnvoll.",
+        "Grundlegende Strukturen und Wörter (z. B. to be, einfache Fragen, Präsens, Zeitangaben) werden überwiegend erkannt. Passend sind kurze, klar aufgebaute Materialien mit Unterstützung, z. B. Wortlisten und Beispielsätze.",
+        "Häufige Alltagsstrukturen (z. B. einfache Vergangenheit, Steigerung, Verlaufsform) werden überwiegend sicher erkannt. Passend sind kurze, klar aufgebaute Texte mit Wortschatzhilfen.",
+        "Zentrale Strukturen der Mittelstufe (z. B. Present Perfect, Bedingungssätze, Passiv, indirekte Fragen) werden überwiegend sicher erkannt. Passend ist alltagsnahes und berufsbezogenes Material mit gelegentlichen Hilfen.",
+        "Auch anspruchsvollere Strukturen (z. B. Past Perfect, Future Perfect, Gerundium und Infinitiv, Phrasal Verbs) werden überwiegend sicher erkannt. Passend ist authentisches Material mit vertiefenden Zusatzaufgaben.",
+        "Auch seltenere und gehobene Strukturen (z. B. Inversion, Konjunktiv, feste Wendungen) werden überwiegend sicher erkannt. Passend sind anspruchsvolle Erweiterungsaufgaben.",
         "Auch seltene idiomatische Wendungen und sehr gehobene Strukturen werden überwiegend sicher erkannt. Oberhalb dieser Stufe kann der Test nicht weiter unterscheiden."
     ];
 
@@ -877,6 +1073,12 @@
         window.speechSynthesis.speak(utterance);
     }
 
+    // Laufender Schätzwert aus den bisherigen Grammatik/Wortschatz-Antworten (F-03).
+    // Ohne Antworten ergibt die Vorannahme B1.
+    function laufendeStufe() {
+        return ermittleNiveau(protokoll.filter(p => p.bereich === "G" || p.bereich === "W")).stufe;
+    }
+
     function aktualisiereAudioAnzeige() {
         const playBtn = document.getElementById("play-audio-btn");
         const label = document.getElementById("play-audio-label");
@@ -884,41 +1086,136 @@
         const rest = MAX_WIEDERGABEN - wiedergaben;
         if (rest <= 0) {
             playBtn.disabled = true;
-            label.textContent = "Hörtext wurde " + MAX_WIEDERGABEN + "-mal abgespielt";
-            audioHinweis.textContent = "Beantworte die Frage jetzt.";
+            label.textContent = "Hörtext " + MAX_WIEDERGABEN + "-mal gehört";
+            audioHinweis.textContent = "Du hast den Text " + MAX_WIEDERGABEN + "-mal gehört. Wähle jetzt die Antwort, die am besten passt.";
         } else {
             playBtn.disabled = false;
             label.textContent = wiedergaben === 0 ? "Hörtext abspielen" : "Hörtext noch einmal abspielen";
-            audioHinweis.textContent = "Du kannst den Hörtext höchstens " + MAX_WIEDERGABEN + "-mal abspielen (noch " + rest + "-mal).";
+            audioHinweis.textContent = wiedergaben === 0
+                ? "Lies zuerst die Frage und die Antworten. Hör dir dann den Text an. Du kannst ihn " + MAX_WIEDERGABEN + "-mal hören."
+                : "Du kannst den Text noch " + rest + "-mal hören.";
         }
     }
 
-    function loadNextQuestion() {
-        if (questionsAsked >= maxQuestions) {
-            showResult();
-            return;
+    // Wählt die nächste Aufgabe gemäß ABLAUF und setzt currentQuestionData /
+    // currentQuestionLevel (ohne Bildschirmausgabe).
+    function waehleNaechsteAufgabe() {
+        const typ = ABLAUF[questionsAsked];
+        if (typ === "L") {
+            // Neuer Lesetext, wenn noch keiner läuft oder alle Fragen bearbeitet sind.
+            // F-03: Erster Text auf der laufend geschätzten Stufe (nicht auf dem
+            // schwankenden Zwischenstand des Treppenverfahrens); der zweite Text
+            // richtet sich nach dem Ergebnis des ersten (3/3 -> eine Stufe höher,
+            // 0-1/3 -> eine Stufe tiefer, sonst gleiche Stufe).
+            if (!aktuellerLesetext || leseFrageIndex >= aktuellerLesetext.fragen.length) {
+                let zielStufe = laufendeStufe();
+                if (aktuellerLesetext) {
+                    const vorher = aktuellerLesetext;
+                    const richtigImText = protokoll.filter(p =>
+                        p.richtig && vorher.fragen.some(f => f.id === p.id)).length;
+                    const anzahl = vorher.fragen.length;
+                    zielStufe = vorher.stufe + (richtigImText === anzahl ? 1 : richtigImText <= 1 ? -1 : 0);
+                    zielStufe = Math.max(0, Math.min(levelNames.length - 1, zielStufe));
+                }
+                aktuellerLesetext = waehleLesetext(zielStufe, benutzteLesetexte);
+                benutzteLesetexte.add(aktuellerLesetext.id);
+                leseFrageIndex = 0;
+            }
+            const frage = aktuellerLesetext.fragen[leseFrageIndex];
+            currentQuestionData = {
+                id: frage.id,
+                konstrukt: frage.konstrukt,
+                bereich: "L",
+                textId: aktuellerLesetext.id,
+                frageNr: leseFrageIndex + 1,
+                // Frage steht über dem Text, der Text in einem eigenen Kasten
+                q: `Question ${leseFrageIndex + 1} of ${aktuellerLesetext.fragen.length}: ${frage.q}`,
+                options: frage.options,
+                answer: frage.answer
+            };
+            currentQuestionLevel = aktuellerLesetext.stufe;
+            leseFrageIndex++;
+        } else {
+            // F-03: Höraufgaben auf der laufend geschätzten Stufe, adaptive
+            // Grammatik/Wortschatz-Aufgaben auf dem Stand des Treppenverfahrens
+            const stufe = typ === "H" ? laufendeStufe() : currentLevel;
+            const auswahl = waehleAufgabe(stufe, typ === "H", usedQuestions, benutzteKonstrukte);
+            currentQuestionData = auswahl.frage;
+            currentQuestionLevel = auswahl.stufe;
         }
-
-        const istHoeraufgabe = HOER_POSITIONEN.includes(questionsAsked);
-        const auswahl = waehleAufgabe(currentLevel, istHoeraufgabe, usedQuestions, benutzteKonstrukte);
-        currentQuestionData = auswahl.frage;
-        currentQuestionLevel = auswahl.stufe;
         usedQuestions.add(currentQuestionData.id);
         benutzteKonstrukte.add(currentQuestionData.konstrukt);
         wiedergaben = 0;
+    }
 
-        document.getElementById("progress").textContent = `Frage ${questionsAsked + 1} von ${maxQuestions}`;
-        // Kurzer deutscher Arbeitsauftrag je Aufgabentyp (C-37)
-        let auftrag = "Wähle die passende Lösung für die Lücke.";
-        if (currentQuestionData.bereich === "H") {
-            auftrag = textStattTon
-                ? "Lies den Hörtext und beantworte die Frage."
-                : "Hör dir den Text an und beantworte die Frage.";
-        } else if (currentQuestionData.bereich === "L") {
-            auftrag = "Lies den Text und beantworte die Frage.";
+    // Setzt den deutschen Arbeitsauftrag mit einer englischen Zeile darunter
+    function setzeArbeitsauftrag(deutsch, englisch) {
+        const el = document.getElementById("arbeitsauftrag");
+        el.textContent = deutsch;
+        const en = document.createElement("span");
+        en.className = "auftrag-en";
+        en.lang = "en";
+        en.textContent = englisch;
+        el.appendChild(en);
+    }
+
+    let angezeigterLesetextId = null;
+
+    // Zeigt currentQuestionData an (auch nach dem Fortsetzen eines unterbrochenen Tests)
+    function zeigeAufgabe() {
+        const bereich = currentQuestionData.bereich;
+        const bereichName = bereich === "H" ? "Hören" : bereich === "L" ? "Lesen" : "Grammatik und Wortschatz";
+        document.getElementById("progress").textContent =
+            `Frage ${questionsAsked + 1} von ${maxQuestions} · ${bereichName}`;
+
+        // Kurze Ermutigung zur Halbzeit
+        document.getElementById("ermutigung").textContent =
+            questionsAsked === Math.floor(maxQuestions / 2)
+                ? "Halbzeit! Du hast schon die Hälfte geschafft. Mach in Ruhe weiter."
+                : "";
+
+        // Arbeitsauftrag je Aufgabentyp, deutsch und englisch (C-37)
+        if (bereich === "H") {
+            if (textStattTon) {
+                setzeArbeitsauftrag("Lies den Hörtext und beantworte die Frage.",
+                    "Read the transcript and answer the question.");
+            } else {
+                setzeArbeitsauftrag("Lies zuerst die Frage und die Antworten. Hör dir dann den Text an.",
+                    "Read the question and the answers first. Then listen to the text.");
+            }
+        } else if (bereich === "L") {
+            if (currentQuestionData.frageNr > 1) {
+                setzeArbeitsauftrag("Neue Frage zum gleichen Text.", "A new question about the same text.");
+            } else {
+                setzeArbeitsauftrag("Lies den Text und beantworte die Frage.", "Read the text and answer the question.");
+            }
+        } else {
+            setzeArbeitsauftrag("Wähle die passende Lösung für die Lücke.", "Choose the answer that fits the gap.");
         }
-        document.getElementById("arbeitsauftrag").textContent = auftrag;
         document.getElementById("question-text").textContent = currentQuestionData.q;
+
+        // Lesetext in eigenem Kasten; bei Folgefragen zum selben Text bleibt die Leseposition erhalten
+        const leseBereich = document.getElementById("lesetext-bereich");
+        if (bereich === "L") {
+            const text = lesetexte.find(t => t.id === currentQuestionData.textId);
+            const kasten = document.getElementById("lesetext");
+            if (angezeigterLesetextId !== text.id) {
+                kasten.textContent = "";
+                const titel = document.createElement("strong");
+                titel.textContent = text.titel;
+                kasten.appendChild(titel);
+                kasten.appendChild(document.createTextNode("\n" + text.text));
+                kasten.scrollTop = 0;
+                angezeigterLesetextId = text.id;
+            }
+            leseBereich.style.display = "block";
+            document.getElementById("lesetext-scrollhinweis").textContent =
+                kasten.scrollHeight > kasten.clientHeight + 4
+                    ? "Der Text ist länger: Scrolle im Kasten nach unten, um alles zu lesen."
+                    : "";
+        } else {
+            leseBereich.style.display = "none";
+        }
 
         // Prüfen, ob die Frage eine Hörverstehens-Aufgabe ist
         const audioContainer = document.getElementById("audio-container");
@@ -936,6 +1233,7 @@
                     wiedergaben++;
                     playListeningAudio(currentQuestionData.audioText);
                     aktualisiereAudioAnzeige();
+                    speichereZwischenstand(); // Neuladen setzt die Wiedergaben nicht zurück
                 };
             } else {
                 // Ohne Ton wäre die Aufgabe nicht lösbar: Text einblenden (wird vermerkt)
@@ -1001,8 +1299,117 @@
         eingabeSperreTimer = setTimeout(() => { optionsDiv.disabled = false; }, EINGABESPERRE_MS);
 
         antwortGesperrt = false;
-        // Fokus auf die neue Frage, damit Screenreader sie ansagen (C-36)
+        // Fokus auf die neue Frage, damit Screenreader sie ansagen (C-36). Der
+        // Lesetext liegt außerhalb dieses Bereichs und wird nicht jedes Mal neu vorgelesen.
         document.getElementById("frage-kopf").focus();
+    }
+
+    function loadNextQuestion() {
+        if (questionsAsked >= maxQuestions) {
+            showResult();
+            return;
+        }
+        waehleNaechsteAufgabe();
+        zeigeAufgabe();
+        speichereZwischenstand();
+    }
+
+    // ==== Zwischenstand (nur in diesem Browser-Tab, wird beim Schließen gelöscht) ====
+    // Nach versehentlichem Neuladen kann der Test an derselben Stelle weitergehen.
+    // sessionStorage statt localStorage: Auf geteilten Geräten bleibt nach dem
+    // Schließen des Tabs nichts zurück.
+    const ZWISCHENSTAND_SCHLUESSEL = "englischtest-zwischenstand";
+
+    function speichereZwischenstand() {
+        try {
+            sessionStorage.setItem(ZWISCHENSTAND_SCHLUESSEL, JSON.stringify({
+                version: 1,
+                phase: ergebnisBereit ? "ergebnis" : "test",
+                hoerteilAktiv, studentData, textStattTon, keineEnglischeStimme,
+                startZeit, startUhrzeit, endZeit, versuchAufGeraet, durchlaufId,
+                currentLevel, questionsAsked, totalScore, protokoll,
+                usedQuestions: [...usedQuestions],
+                benutzteKonstrukte: [...benutzteKonstrukte],
+                benutzteLesetexte: [...benutzteLesetexte],
+                aktuellerLesetextId: aktuellerLesetext ? aktuellerLesetext.id : null,
+                leseFrageIndex, currentQuestionData, currentQuestionLevel, wiedergaben,
+                uebermittlungGeoeffnet
+            }));
+        } catch (e) {
+            // Speicher nicht verfügbar: Test läuft trotzdem, nur ohne Fortsetzen
+        }
+    }
+
+    function ladeZwischenstand() {
+        try {
+            const daten = JSON.parse(sessionStorage.getItem(ZWISCHENSTAND_SCHLUESSEL) || "null");
+            if (!daten || daten.version !== 1 || daten.hoerteilAktiv !== hoerteilAktiv) return null;
+            return daten;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function stelleZwischenstandWiederHer(d) {
+        studentData = d.studentData;
+        textStattTon = d.textStattTon;
+        keineEnglischeStimme = d.keineEnglischeStimme;
+        startZeit = d.startZeit;
+        startUhrzeit = d.startUhrzeit;
+        endZeit = d.endZeit;
+        versuchAufGeraet = d.versuchAufGeraet;
+        durchlaufId = d.durchlaufId;
+        currentLevel = d.currentLevel;
+        questionsAsked = d.questionsAsked;
+        totalScore = d.totalScore;
+        protokoll.length = 0;
+        d.protokoll.forEach(p => protokoll.push(p));
+        usedQuestions = new Set(d.usedQuestions);
+        benutzteKonstrukte.clear();
+        d.benutzteKonstrukte.forEach(k => benutzteKonstrukte.add(k));
+        benutzteLesetexte.clear();
+        d.benutzteLesetexte.forEach(t => benutzteLesetexte.add(t));
+        aktuellerLesetext = d.aktuellerLesetextId ? lesetexte.find(t => t.id === d.aktuellerLesetextId) : null;
+        leseFrageIndex = d.leseFrageIndex;
+        currentQuestionData = d.currentQuestionData;
+        currentQuestionLevel = d.currentQuestionLevel;
+        uebermittlungGeoeffnet = d.uebermittlungGeoeffnet;
+    }
+
+    function verwerfeZwischenstand() {
+        try { sessionStorage.removeItem(ZWISCHENSTAND_SCHLUESSEL); } catch (e) { /* ohne Speicher nichts zu tun */ }
+    }
+
+    // Beim Laden: unterbrochenen Test anbieten bzw. Ergebnisseite wiederherstellen
+    function pruefeZwischenstand() {
+        const d = ladeZwischenstand();
+        if (!d) return;
+        document.getElementById("student-form").style.display = "none";
+        if (d.phase === "ergebnis") {
+            stelleZwischenstandWiederHer(d);
+            showResult();
+            document.getElementById("uebermittlung-status").textContent =
+                "Dein Ergebnis wurde wiederhergestellt. Falls du es noch nicht abgeschickt hast: Klicke auf „Ergebnis an Lehrkraft senden“.";
+            return;
+        }
+        document.getElementById("fortsetzen").style.display = "block";
+        document.getElementById("fortsetzen-text").textContent =
+            `Der Test von ${d.studentData.name} (Klasse ${d.studentData.schoolClass}) wurde unterbrochen. ` +
+            `Du warst bei Frage ${d.questionsAsked + 1} von ${maxQuestions}. Deine bisherigen Antworten sind gespeichert.`;
+        document.getElementById("fortsetzen-ja").onclick = () => {
+            stelleZwischenstandWiederHer(d);
+            wiedergaben = d.wiedergaben;
+            document.getElementById("fortsetzen").style.display = "none";
+            document.getElementById("quiz").style.display = "block";
+            testLaeuft = true;
+            zeigeAufgabe();
+        };
+        document.getElementById("fortsetzen-nein").onclick = () => {
+            verwerfeZwischenstand();
+            document.getElementById("fortsetzen").style.display = "none";
+            document.getElementById("student-form").style.display = "block";
+        };
+        document.getElementById("fortsetzen-ja").focus();
     }
 
     function handleAnswer() {
@@ -1031,8 +1438,8 @@
             alsText: istHoeraufgabe && textStattTon
         });
 
-        // Höraufgaben verändern die adaptive Stufe nicht; sie werden getrennt ausgewiesen
-        if (!istHoeraufgabe) {
+        // Hör- und Leseaufgaben verändern die adaptive Stufe nicht; sie werden getrennt ausgewiesen
+        if (currentQuestionData.bereich === "G" || currentQuestionData.bereich === "W") {
             currentLevel = naechsteStufe(currentLevel, richtig);
         }
 
@@ -1095,6 +1502,7 @@
         stoppeSprachausgabe(); // Stoppt Sprachausgabe am Testende
         testLaeuft = false;
         ergebnisBereit = true;
+        if (!endZeit) endZeit = Date.now();
         document.getElementById("quiz").style.display = "none";
         document.getElementById("result").style.display = "block";
 
@@ -1110,13 +1518,13 @@
                 zusammenfassung.appendChild(document.createTextNode(wert));
             });
 
-        // Einstufung aus dem adaptiven Teil (ohne Höraufgaben), siehe ermittleNiveau()
-        const niveau = ermittleNiveau(protokoll.filter(p => p.bereich !== "H"));
+        // Einstufung nur aus Grammatik und Wortschatz (ohne Lesen und Hören), siehe ermittleNiveau()
+        const niveau = ermittleNiveau(protokoll.filter(p => p.bereich === "G" || p.bereich === "W"));
         const finalLevelIndex = niveau.stufe;
         const finalLevelName = levelNames[finalLevelIndex];
         const finalLevelDesc = niveau.gesichert
             ? levelDescriptions[finalLevelIndex]
-            : "Auch grundlegende Strukturen wurden im Test noch nicht sicher erkannt. Für den Unterricht passt Material mit sehr einfachen Sätzen, Bildern und viel Unterstützung. In den ersten Stunden genauer beobachten (ggf. auch Testbedingungen prüfen).";
+            : "Grundlegende Strukturen wurden im Test noch nicht sicher erkannt. Passend sind sehr einfache, kurze Materialien mit viel Unterstützung. Empfehlung: den Lernstand in den ersten Unterrichtswochen zusätzlich im Gespräch einschätzen und prüfen, ob die Testbedingungen (z. B. Ton, Gerät) gepasst haben.";
 
         // Neutrale, nicht stigmatisierende Rückmeldung an die Lernenden (C-38):
         // keine GER-Stufe, keine Punktzahl. Bei adaptiven Tests liegt die Quote
@@ -1137,7 +1545,7 @@
             bandText = `Wahrscheinlicher Bereich: ${bereichText}`;
         }
 
-        const anzahlSprachmittel = protokoll.filter(p => p.bereich !== "H").length;
+        const anzahlSprachmittel = protokoll.filter(p => p.bereich === "G" || p.bereich === "W").length;
         document.getElementById("level-badge").textContent = `Orientierungswert: ${finalLevelName}`;
         document.getElementById("level-band").textContent = bandText;
         document.getElementById("score-info").textContent =
@@ -1172,7 +1580,23 @@
         const zeile = neueListe("Profil (richtig gelöst / bearbeitet, je Stufe):");
         zeile(`Grammatik: ${grammatik.r} von ${grammatik.n}` + (grammatik.n ? ` (${grammatik.stufenText})` : ""));
         zeile(`Wortschatz und feste Wendungen: ${wortschatz.r} von ${wortschatz.n}` + (wortschatz.n ? ` (${wortschatz.stufenText})` : ""));
-        if (lesen.n > 0) zeile(`Leseaufgabe: ${lesen.r} von ${lesen.n}`);
+        // F-03: Lesen je Text ausweisen; "gelöst" = mindestens 2 von 3 Fragen richtig
+        const leseErgebnisse = lesetexte
+            .filter(t => benutzteLesetexte.has(t.id))
+            .map(t => {
+                const eintraege = protokoll.filter(p => t.fragen.some(f => f.id === p.id));
+                return { text: t, n: eintraege.length, r: eintraege.filter(p => p.richtig).length };
+            })
+            .filter(e => e.n > 0);
+        const geloesteTexte = leseErgebnisse.filter(e => e.r >= 2 && e.r / e.n >= 0.6);
+        const leseEinordnung = geloesteTexte.length
+            ? `Texte bis ${levelNames[Math.max(...geloesteTexte.map(e => e.text.stufe))]} überwiegend verstanden`
+            : (leseErgebnisse.length
+                ? `noch kein Text überwiegend verstanden (niedrigste Textstufe: ${levelNames[Math.min(...leseErgebnisse.map(e => e.text.stufe))]})`
+                : "nicht bearbeitet");
+        zeile(`Leseverstehen: ${lesen.r} von ${lesen.n} – ` +
+            leseErgebnisse.map(e => `Text auf ${levelNames[e.text.stufe]}: ${e.r}/${e.n}`).join(", ") +
+            ` → ${leseEinordnung}`);
         if (hoerteilAktiv) {
             zeile(`Hörverstehen: ${hoeren.r} von ${hoeren.n} (${hoeren.stufenText})` +
                 (alsTextGelesen ? " – Hörtexte wurden als Text gelesen" : ""));
@@ -1183,32 +1607,47 @@
 
         // Gelöste und nicht gelöste Bereiche (C-11): Hinweise für die Förderplanung.
         // Jeder Eintrag beruht meist auf nur einer Aufgabe - Hinweis, kein Befund.
-        const konstruktListe = (geloest) => {
+        // F-04: Im adaptiven Test werden Aufgaben oberhalb der eigenen Stufe
+        // absichtlich gestellt und meist nicht gelöst. Als möglicher Förderbedarf
+        // zählen deshalb nur nicht gelöste Aufgaben auf oder unter der ermittelten Stufe.
+        const konstruktListe = (bedingung) => {
             const eintraege = [];
-            protokoll.filter(p => p.bereich !== "H" && p.richtig === geloest).forEach(p => {
+            protokoll.filter(p => p.bereich !== "H" && bedingung(p)).forEach(p => {
                 const text = `${p.konstrukt} (${levelNames[p.stufe]})`;
                 if (!eintraege.includes(text)) eintraege.push(text);
             });
             return eintraege;
         };
-        const geloesteBereiche = konstruktListe(true);
-        const offeneBereiche = konstruktListe(false);
-        const geloestZeile = neueListe("Sicher gelöst:");
+        const geloesteBereiche = konstruktListe(p => p.richtig);
+        const foerderBereiche = konstruktListe(p => !p.richtig && p.stufe <= finalLevelIndex);
+        const oberhalbNichtGeloest = protokoll.filter(p =>
+            p.bereich !== "H" && !p.richtig && p.stufe > finalLevelIndex).length;
+        const geloestZeile = neueListe("Gelöst:");
         geloesteBereiche.length ? geloesteBereiche.forEach(geloestZeile) : geloestZeile("–");
-        const offenZeile = neueListe("Nicht gelöst (möglicher Förderbedarf):");
-        offeneBereiche.length ? offeneBereiche.forEach(offenZeile) : offenZeile("–");
+        const offenZeile = neueListe(`Noch nicht gelöst auf oder unter der ermittelten Stufe ${finalLevelName} – hier lohnt sich Übung (möglicher Förderbedarf):`);
+        foerderBereiche.length ? foerderBereiche.forEach(offenZeile) : offenZeile("–");
+        if (oberhalbNichtGeloest > 0) {
+            const oberhalbHinweis = document.createElement("div");
+            oberhalbHinweis.className = "klein";
+            oberhalbHinweis.textContent =
+                `Außerdem ${oberhalbNichtGeloest} Aufgabe${oberhalbNichtGeloest === 1 ? "" : "n"} oberhalb der ermittelten Stufe nicht gelöst. ` +
+                "Das ist im adaptiven Test so vorgesehen und kein Förderbedarf.";
+            profilBox.appendChild(oberhalbHinweis);
+        }
 
         const fussnote = document.createElement("div");
         fussnote.className = "klein";
         fussnote.textContent =
-            "Lesen, Schreiben und Sprechen wurden in diesem Test nicht oder kaum erfasst. " +
+            "Schreiben und Sprechen wurden in diesem Test nicht erfasst. " +
+            "Lese- und Hörtexte wurden passend zum laufenden Grammatik/Wortschatz-Schätzwert gewählt; " +
+            "der zweite Lesetext richtet sich zusätzlich nach dem Ergebnis des ersten. " +
             "Die Bereichsangaben beruhen meist auf einer einzelnen Aufgabe und sind als Hinweise zu verstehen. " +
             `Durchlauf ${durchlaufId}, Start ${startUhrzeit} Uhr, ` +
             (versuchAufGeraet > 0 ? `${versuchAufGeraet}. Versuch auf diesem Gerät.` : "Versuchszahl auf diesem Gerät unbekannt.");
         profilBox.appendChild(fussnote);
 
         // Kompaktes Profil und Antwortprotokoll für die Lehrkraft (Forms, optional)
-        const dauerMinuten = startZeit ? Math.round((Date.now() - startZeit) / 60000) : 0;
+        const dauerMinuten = startZeit ? Math.round((endZeit - startZeit) / 60000) : 0;
         const hinweise = [];
         if (!hoerteilAktiv) hinweise.push("ohne Hoerteil");
         if (alsTextGelesen) hinweise.push("Hoertexte als Text");
@@ -1219,7 +1658,9 @@
             ` | Schaetzwert ${niveau.theta.toFixed(2)} (SE ${niveau.standardfehler.toFixed(2)})` +
             ` | G ${grammatik.r}/${grammatik.n} [${grammatik.stufenText}]` +
             ` | W ${wortschatz.r}/${wortschatz.n} [${wortschatz.stufenText}]` +
-            (lesen.n ? ` | L ${lesen.r}/${lesen.n}` : "") +
+            (lesen.n ? ` | L ${lesen.r}/${lesen.n} [` +
+                leseErgebnisse.map(e => `${e.text.id.slice(2)} ${e.r}/${e.n}`).join(", ") + `] ${leseEinordnung}` : "") +
+            ` | Foerderbedarf: ${foerderBereiche.length ? foerderBereiche.join("; ") : "-"}` +
             (hoerteilAktiv ? ` | H ${hoeren.r}/${hoeren.n} [${hoeren.stufenText}]` : "") +
             (anzahlWeissNicht ? ` | weiss nicht ${anzahlWeissNicht}x` : "") +
             ` | Dauer ${dauerMinuten} min` +
@@ -1260,23 +1701,30 @@
         ersatzLink.style.display = "inline-block";
         ersatzLink.onclick = () => {
             uebermittlungGeoeffnet = true;
+            speichereZwischenstand();
             document.getElementById("uebermittlung-status").textContent =
                 "Das Formular wurde in einem neuen Tab geöffnet. Klicke dort unten auf „Absenden“. Falls sich nichts geöffnet hat, klicke noch einmal auf den Button.";
         };
 
         document.querySelector("#result h2").setAttribute("tabindex", "-1");
         document.querySelector("#result h2").focus();
+        // Ergebnis sichern: Nach versehentlichem Neuladen kann es noch abgeschickt werden
+        speichereZwischenstand();
     }
 
     // ==== Initialisierung (am Skriptende, damit alle Konstanten definiert sind) ====
     // Umfangsangabe in der Einführung an den Modus anpassen (C-37)
     if (!hoerteilAktiv) {
         document.getElementById("intro-umfang").textContent =
-            `Du bearbeitest ${maxQuestions} Aufgaben. Das dauert etwa 15 bis 20 Minuten.`;
+            `Du bearbeitest ${maxQuestions} Aufgaben: Lücken-Sätze und 2 kurze Texte zum Lesen.`;
+        document.getElementById("intro-umfang-en").textContent =
+            `You will answer ${maxQuestions} questions: gap sentences and 2 short reading texts.`;
     }
 
     // Prüfcode-Testansicht (C-28): ...index.html?pruefcode
-    if (new URLSearchParams(window.location.search).has("pruefcode")) {
+    if (!new URLSearchParams(window.location.search).has("pruefcode")) {
+        pruefeZwischenstand();
+    } else {
         document.getElementById("student-form").style.display = "none";
         document.getElementById("pruefcode-test").style.display = "block";
         document.getElementById("pc-datum").value = new Date().toLocaleDateString("de-DE");
