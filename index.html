@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Englisch Einstufungstest (General & Vocational English)</title>
+    <title>Englisch-Einstufungstest (Orientierung: Grammatik, Wortschatz, Hörverstehen)</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -30,27 +30,65 @@
             color: #2c3e50;
             text-align: center;
         }
+        /* Farben auf WCAG-AA-Kontrast angehoben (weiß auf #1c6ea4 = 5,5:1, vorher 3,15:1) */
         .option-btn, .action-btn {
             display: block;
             width: 100%;
             padding: 12px 15px;
             margin: 10px 0;
-            background-color: #3498db;
+            background-color: #1c6ea4;
             color: white;
-            border: none;
+            border: 2px solid transparent;
             border-radius: 5px;
             font-size: 15px;
             cursor: pointer;
             transition: background 0.3s;
             text-align: left;
             line-height: 1.4;
+            box-sizing: border-box;
+            font-family: inherit;
         }
         .option-btn:hover, .action-btn:hover {
-            background-color: #2980b9;
+            background-color: #0f4c75;
+        }
+        .option-btn input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            margin: 0 10px 0 0;
+            vertical-align: middle;
+            accent-color: #ffffff;
+            cursor: pointer;
+        }
+        /* Ausgewählte Antwort: dunklere Farbe UND Rahmen, nicht nur Farbe */
+        .option-btn.ausgewaehlt {
+            background-color: #0f4c75;
+            border-color: #1a1a1a;
+            font-weight: bold;
         }
         .action-btn {
             text-align: center;
             font-weight: bold;
+        }
+        .action-btn:disabled {
+            background-color: #6b7780;
+            cursor: not-allowed;
+        }
+        .start-btn {
+            background-color: #1e7d46;
+        }
+        .audio-btn {
+            background-color: #8e44ad;
+            width: auto;
+            display: inline-block;
+            padding: 10px 20px;
+        }
+        .secondary-btn {
+            background-color: #4a5560;
+        }
+        /* Deutlich sichtbare Fokusmarkierung für Tastaturbedienung */
+        .action-btn:focus-visible, .option-btn:focus-within, .form-group input:focus-visible, a.action-btn:focus-visible {
+            outline: 3px solid #1a1a1a;
+            outline-offset: 2px;
         }
         .form-group {
             margin-bottom: 15px;
@@ -65,12 +103,12 @@
         .form-group input {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ccc;
+            border: 1px solid #7b8389;
             border-radius: 5px;
             box-sizing: border-box;
             font-size: 15px;
         }
-        #quiz, #result {
+        #quiz, #result, #tontest, #beispiel, #pruefcode-test {
             display: none;
         }
         #student-form {
@@ -81,7 +119,7 @@
             font-size: 22px;
             font-weight: bold;
             padding: 10px 20px;
-            background: #2ecc71;
+            background: #1e7d46;
             color: white;
             border-radius: 5px;
             margin-top: 15px;
@@ -89,18 +127,57 @@
         #progress {
             margin-bottom: 15px;
             font-size: 14px;
-            color: #7f8c8d;
+            color: #5a6a6b;
             text-align: center;
         }
-        #question-text {
+        #frage-kopf:focus {
+            outline: none;
+        }
+        /* Kurzer deutscher Arbeitsauftrag über jeder Aufgabe (C-37) */
+        .arbeitsauftrag {
+            font-size: 14px;
+            font-weight: bold;
+            color: #34495e;
+            margin-bottom: 8px;
+        }
+        /* "Ich weiß es nicht" steht immer unten und ist farblich abgesetzt (C-10) */
+        .option-btn.option-weissnicht {
+            background-color: #4a5560;
+            margin-top: 18px;
+        }
+        .option-btn.option-weissnicht:hover, .option-btn.option-weissnicht.ausgewaehlt {
+            background-color: #2f363d;
+        }
+        #lehrkraft-details {
+            margin-top: 25px;
+            border-top: 1px solid #7b8389;
+            padding-top: 10px;
+        }
+        #lehrkraft-details summary {
+            cursor: pointer;
+            font-weight: bold;
+            color: #34495e;
+            padding: 6px 0;
+        }
+        #lehrkraft-details summary:focus-visible {
+            outline: 3px solid #1a1a1a;
+            outline-offset: 2px;
+        }
+        .question-box, #question-text {
             white-space: pre-line;
             background-color: #f8f9fa;
             padding: 15px;
-            border-left: 4px solid #3498db;
+            border-left: 4px solid #1c6ea4;
             border-radius: 4px;
             margin-bottom: 20px;
             line-height: 1.5;
             font-size: 16px;
+        }
+        #options {
+            border: none;
+            margin: 0;
+            padding: 0;
+            min-width: 0;
         }
         .result-box {
             background: #ecf0f1;
@@ -110,95 +187,526 @@
             text-align: left;
             font-size: 15px;
         }
+        .result-box ul {
+            margin: 8px 0 0 0;
+            padding-left: 20px;
+        }
+        .result-box li {
+            margin-bottom: 4px;
+        }
         .score-info {
-            font-size: 12px;
-            color: #7f8c8d;
+            font-size: 13px;
+            color: #5a6a6b;
             margin-top: 8px;
             text-align: center;
+        }
+        .hinweis-box {
+            font-size: 14px;
+            color: #1a5a84;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 25px;
+            padding: 10px;
+            background-color: #e8f4f8;
+            border-radius: 5px;
+        }
+        .klein {
+            font-size: 13px;
+            color: #5a6a6b;
+            margin-top: 5px;
+            line-height: 1.5;
+        }
+        .warnung {
+            color: #b03a2e;
+            font-weight: bold;
+        }
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
         }
     </style>
 </head>
 <body>
 
-<div id="quiz-container">
+<main id="quiz-container">
     <!-- Schritt 1: Schülerdaten erfassen -->
     <div id="student-form">
-        <h2>Englisch Einstufungstest</h2>
-        <p style="text-align: center; color: #666; margin-bottom: 25px;">Bitte gib deine Daten ein, um den Test zu starten.</p>
-        
+        <h2>Englisch-Einstufungstest</h2>
+        <!-- Einführung (C-37) -->
+        <div class="result-box" style="margin-bottom: 20px;">
+            <strong>So funktioniert der Test</strong>
+            <ul>
+                <li id="intro-umfang">Du bearbeitest 25 Aufgaben, davon 4 Höraufgaben. Dafür brauchst du Kopfhörer. Das dauert etwa 20 Minuten.</li>
+                <li>Die Aufgaben passen sich an dich an: Sie werden schwerer oder leichter. Das ist normal.</li>
+                <li>Du kannst nicht zurückgehen.</li>
+                <li>Wenn du eine Vermutung hast, wähle sie. Wenn du gar keine Idee hast, wähle „Ich weiß es nicht“.</li>
+                <li>Der Test wird nicht benotet. Er hilft deiner Lehrkraft, den Unterricht passend zu planen.</li>
+            </ul>
+        </div>
+        <p style="text-align: center; color: #5a6a6b; margin-bottom: 25px;">Bitte gib deine Daten ein, um den Test zu starten.</p>
+
         <div class="form-group">
             <label for="student-name">Vor- und Nachname:</label>
-            <input type="text" id="student-name" placeholder="z. B. Max Mustermann" required>
+            <input type="text" id="student-name" placeholder="z. B. Max Mustermann" autocomplete="name" required>
         </div>
         <div class="form-group">
             <label for="student-class">Klasse:</label>
             <input type="text" id="student-class" placeholder="z. B. WBT11a" required>
         </div>
-        <div class="form-group">
-            <label for="student-year">Schuljahr:</label>
-            <input type="text" id="student-year" placeholder="z. B. 2026/2027" required>
+
+        <button type="button" class="action-btn start-btn" onclick="startTest()" style="margin-top: 20px;">Weiter</button>
+    </div>
+
+    <!-- Schritt 1a: Beispielaufgabe (C-37), wird nicht gewertet -->
+    <div id="beispiel">
+        <h2>Beispielaufgabe</h2>
+        <p class="klein" style="text-align: center;">So sehen die Aufgaben aus. Diese Aufgabe zählt nicht.</p>
+        <div class="arbeitsauftrag">Wähle die passende Lösung für die Lücke.</div>
+        <div class="question-box" id="beispiel-frage" lang="en">My name _____ Anna.</div>
+        <fieldset id="beispiel-optionen" aria-describedby="beispiel-frage" style="border: none; margin: 0; padding: 0; min-width: 0;">
+            <legend class="sr-only">Antwortmöglichkeiten</legend>
+            <label class="option-btn" lang="en"><input type="radio" name="beispiel" value="falsch"><span>are</span></label>
+            <label class="option-btn" lang="en"><input type="radio" name="beispiel" value="richtig"><span>is</span></label>
+            <label class="option-btn" lang="en"><input type="radio" name="beispiel" value="falsch"><span>am</span></label>
+            <label class="option-btn" lang="en"><input type="radio" name="beispiel" value="falsch"><span>be</span></label>
+            <label class="option-btn option-weissnicht"><input type="radio" name="beispiel" value="weissnicht"><span>Ich weiß es nicht</span></label>
+        </fieldset>
+        <p id="beispiel-rueckmeldung" class="klein" role="status"></p>
+        <button type="button" id="beispiel-weiter" class="action-btn start-btn" disabled>Weiter</button>
+    </div>
+
+    <!-- Schritt 1b: Tontest vor den Höraufgaben (gleiche Hörbedingungen für alle) -->
+    <div id="tontest">
+        <h2>Vorbereitung: Tontest</h2>
+        <p id="tontest-text">Im Test kommen 4 Höraufgaben vor. Bitte setze jetzt Kopfhörer auf und klicke auf „Probe abspielen“. Du hörst einen kurzen englischen Satz.</p>
+        <div style="text-align: center;">
+            <button type="button" id="tontest-play" class="action-btn audio-btn"><span aria-hidden="true">🔊 </span>Probe abspielen</button>
         </div>
-        
-        <button class="action-btn" onclick="startTest()" style="margin-top: 20px; background-color: #27ae60;">Test starten</button>
+        <p id="tontest-hinweis" class="klein" role="status"></p>
+        <button type="button" id="tontest-ok" class="action-btn start-btn">Ich habe den Satz gut gehört – Test starten</button>
+        <button type="button" id="tontest-problem" class="action-btn secondary-btn">Ich höre nichts oder nur schlecht</button>
+        <div id="tontest-problem-box" style="display: none;">
+            <p class="klein">Bitte melde dich bei deiner Lehrkraft und prüft gemeinsam Lautstärke und Kopfhörer. Danach kannst du die Probe erneut abspielen.</p>
+            <p class="klein">Nur nach Rücksprache mit der Lehrkraft: Du kannst den Test auch ohne Ton starten. Die Hörtexte werden dann als Text angezeigt. Das wird im Ergebnis vermerkt.</p>
+            <button type="button" id="tontest-text-start" class="action-btn secondary-btn">Ohne Ton starten (Hörtexte als Text)</button>
+        </div>
     </div>
 
     <!-- Schritt 2: Der adaptive Test -->
     <div id="quiz">
         <h2 id="quiz-title">Sprachtest</h2>
-        <div id="progress">Frage 1 von 25</div>
-        
-        <!-- Audio-Bereich für Hörverstehens-Aufgaben -->
-        <div id="audio-container" style="display: none; margin-bottom: 15px; text-align: center;">
-            <button id="play-audio-btn" class="action-btn" style="background-color: #8e44ad; width: auto; display: inline-block; padding: 10px 20px;">
-                🔊 Hörtext abspielen
-            </button>
-            <div id="audio-hinweis" style="font-size: 12px; color: #7f8c8d; margin-top: 5px; white-space: pre-line; line-height: 1.5;">Klicke auf den Button, um die englische Sprachausgabe zu hören.</div>
-        </div>
+        <div id="frage-kopf" tabindex="-1">
+            <div id="progress">Frage 1 von 25</div>
 
-        <div id="question-text">Lade Frage...</div>
-        <div id="options"></div>
+            <!-- Audio-Bereich für Hörverstehens-Aufgaben -->
+            <div id="audio-container" style="display: none; margin-bottom: 15px; text-align: center;">
+                <button type="button" id="play-audio-btn" class="action-btn audio-btn">
+                    <span aria-hidden="true">🔊 </span><span id="play-audio-label">Hörtext abspielen</span>
+                </button>
+                <div id="audio-hinweis" class="klein" style="white-space: pre-line;">Klicke auf den Button, um die englische Sprachausgabe zu hören.</div>
+            </div>
+
+            <div id="arbeitsauftrag" class="arbeitsauftrag"></div>
+            <div id="question-text" class="question-box" lang="en">Lade Frage...</div>
+        </div>
+        <fieldset id="options" aria-describedby="question-text"></fieldset>
+        <button type="button" id="weiter-btn" class="action-btn" onclick="handleAnswer()" disabled>Weiter</button>
+        <div class="klein" style="text-align: center;">Wähle eine Antwort und klicke dann auf „Weiter“. Zurückgehen ist nicht möglich.</div>
     </div>
 
     <!-- Schritt 3: Ergebnis & Anzeige -->
     <div id="result">
         <h2>Test abgeschlossen</h2>
         <div class="result-box" id="student-info-summary"></div>
-        <div style="text-align: center;">
-            <div id="level-badge" class="level-badge"></div>
-            <div class="score-info">Gewichtete Rohpunkte (Schwierigkeit: A1 = 2 Pkt. bis C2 = 12 Pkt.)</div>
+        <!-- Neutrale Rückmeldung an die Lernenden (C-38) -->
+        <p id="danke-text" style="font-size: 15px; line-height: 1.5;"></p>
+
+        <div class="hinweis-box">
+            Wichtig: Dein Ergebnis ist erst bei deiner Lehrkraft, wenn du es abschickst.<br>
+            1. Klicke auf „Ergebnis an Lehrkraft senden“. Das Formular öffnet sich in einem neuen Tab.<br>
+            2. Klicke im Formular ganz unten auf „Absenden“.
         </div>
-        <p style="margin-top:20px; font-size:14px; color:#555;" id="level-description"></p>
-        
-        <p style="font-size: 14px; color: #2980b9; font-weight: bold; text-align: center; margin-top: 25px; padding: 10px; background-color: #e8f4f8; border-radius: 5px;">
-            ⏳ Sie werden in wenigen Sekunden automatisch zur Ergebnisübermittlung weitergeleitet...
-        </p>
         <div style="text-align: center;">
-            <a id="manual-forms-link" href="#" class="action-btn" style="display: none; width: auto; text-decoration: none; background-color: #27ae60;">
-                Ergebnis jetzt übermitteln
+            <a id="manual-forms-link" href="#" target="_blank" rel="noopener" class="action-btn start-btn" style="display: none; width: auto; text-decoration: none;">
+                Ergebnis an Lehrkraft senden
             </a>
-            <div style="font-size: 12px; color: #7f8c8d; margin-top: 5px;">Falls die Weiterleitung nicht startet, hier klicken.</div>
+            <div id="uebermittlung-status" class="klein" role="status"></div>
         </div>
+
+        <!-- Ergebnis für die Lehrkraft (C-38): standardmäßig eingeklappt -->
+        <details id="lehrkraft-details">
+            <summary>Ergebnis für die Lehrkraft</summary>
+            <div style="text-align: center;">
+                <div id="level-badge" class="level-badge"></div>
+                <div id="level-band" style="margin-top: 10px; font-weight: bold;"></div>
+                <div class="score-info" id="score-info"></div>
+            </div>
+            <p style="margin-top:20px; font-size:14px; color:#555;" id="level-description"></p>
+            <div class="result-box" id="profil-box"></div>
+        </details>
     </div>
-</div>
+
+    <!-- Prüfcode-Testansicht (C-28), nur über ...index.html?pruefcode erreichbar -->
+    <div id="pruefcode-test">
+        <h2>Prüfcode testen</h2>
+        <p class="klein">Für die Lehrkraft: Werte genau so eintragen, wie sie in der Excel-Zeile stehen. Der hier berechnete Code muss mit dem Code in Excel übereinstimmen. Weicht er nur bei Namen mit „ß“ ab, im Code die Einstellung <code>ESZETT_BEIBEHALTEN</code> umstellen.</p>
+        <div class="form-group"><label for="pc-name">Name:</label><input type="text" id="pc-name" value="Jana Weiß"></div>
+        <div class="form-group"><label for="pc-klasse">Klasse:</label><input type="text" id="pc-klasse" value="WBT11a"></div>
+        <div class="form-group"><label for="pc-datum">Datum (wie übermittelt):</label><input type="text" id="pc-datum"></div>
+        <div class="form-group"><label for="pc-punkte">Punkte:</label><input type="text" id="pc-punkte" value="78"></div>
+        <div class="form-group"><label for="pc-niveau">Niveau:</label><input type="text" id="pc-niveau" value="B1"></div>
+        <div class="result-box" id="pc-ergebnis" role="status"></div>
+    </div>
+</main>
 
 <script>
+    // ==== LOGIK START (Aufgabenbank und Auswertungsregeln; ohne Bildschirmzugriffe) ====
+
+    const levelNames = ["A1", "A2", "B1", "B2", "C1", "C2"];
+
+    // Bereiche: G = Grammatik, W = Wortschatz/Präpositionen/feste Wendungen,
+    //           L = Leseverstehen, H = Hörverstehen
+    // Jede Aufgabe hat eine feste ID, damit das Antwortprotokoll auswertbar ist.
+    // "answer" bezieht sich auf die Reihenfolge in "options"; angezeigt werden
+    // die Optionen bei jeder Aufgabe in zufälliger Reihenfolge.
+    // C-31: Die Lösungen sind im Quelltext sichtbar. Das ist bei einem nicht
+    // benoteten Diagnosetest bewusst in Kauf genommen: Jede Verschleierung im
+    // Browser ließe sich mit den Entwicklerwerkzeugen umgehen und würde nur die
+    // Pflege der Aufgaben erschweren.
+    const questionBank = [
+        [ // Level 0: A1
+            { id: "A1-H1", konstrukt: "Hörverstehen", bereich: "H", q: "Listen to the announcement.\n\nQuestion: What time does the train leave?", audioText: "Attention please. The train to Berlin leaves at three o'clock from platform two.", options: ["At 2 o'clock", "At 3 o'clock", "At 4 o'clock", "At 10 o'clock"], answer: 1 },
+            { id: "A1-H2", konstrukt: "Hörverstehen", bereich: "H", q: "Listen to the phone message.\n\nQuestion: What is Tom's phone number?", audioText: "Hello, my name is Tom. My phone number is zero, seven, nine, four, two, six, one. Please call me back.", options: ["0794261", "0794162", "0784261", "0694261"], answer: 0 },
+            { id: "A1-H3", konstrukt: "Hörverstehen", bereich: "H", q: "Listen to the order in a café.\n\nQuestion: What does the customer order?", audioText: "Good morning. I would like a large black coffee and a croissant, please.", options: ["Tea and cake", "A small milk coffee", "A large black coffee and a croissant", "Water and a sandwich"], answer: 2 },
+            { id: "A1-01", konstrukt: "to be", bereich: "G", q: "I _____ from Germany.", options: ["is", "am", "are", "be"], answer: 1 },
+            { id: "A1-02", konstrukt: "Present Simple (3. Person)", bereich: "G", q: "She _____ to school by bike every day.", options: ["go", "goes", "going", "gone"], answer: 1 },
+            { id: "A1-03", konstrukt: "Fragen mit do/does", bereich: "G", q: "_____ you have a spare pen?", options: ["Do", "Are", "Does", "Is"], answer: 0 },
+            { id: "A1-04", konstrukt: "Präpositionen der Zeit", bereich: "W", q: "Our English class is _____ Monday.", options: ["in", "at", "on", "by"], answer: 2 },
+            { id: "A1-05", konstrukt: "Präpositionen des Ortes", bereich: "W", q: "The cat is sleeping _____ the table.", options: ["under", "between", "next", "in"], answer: 0 },
+            { id: "A1-06", konstrukt: "Präpositionen der Zeit", bereich: "W", q: "The shop opens _____ 9 o'clock.", options: ["in", "on", "at", "to"], answer: 2 },
+            { id: "A1-07", konstrukt: "Verneinung mit do/does", bereich: "G", q: "He _____ not like drinking coffee.", options: ["do", "does", "is", "are"], answer: 1 },
+            { id: "A1-08", konstrukt: "Höfliche Fragen (would)", bereich: "G", q: "_____ you like an apple?", options: ["Would", "Are", "Does", "Have"], answer: 0 },
+            { id: "A1-09", konstrukt: "Pronomen", bereich: "G", q: "This backpack is _____.", options: ["mine", "my", "me", "I"], answer: 0 },
+            { id: "A1-10", konstrukt: "Fragewörter", bereich: "G", q: "_____ old are you?", options: ["How", "What", "Who", "Which"], answer: 0 },
+            { id: "A1-11", konstrukt: "Present Simple", bereich: "G", q: "I usually _____ up at 7 a.m.", options: ["get", "gets", "getting", "got"], answer: 0 },
+            { id: "A1-12", konstrukt: "to be", bereich: "G", q: "They _____ from Spain. They are from Italy.", options: ["doesn't", "don't", "aren't", "isn't"], answer: 2 },
+            { id: "A1-13", konstrukt: "Verstärkende Adverbien", bereich: "W", q: "The weather today is _____ nice.", options: ["much", "very", "many", "lot"], answer: 1 },
+            { id: "A1-14", konstrukt: "Häufigkeitsadverbien", bereich: "G", q: "My brother _____ eats fish.", options: ["never", "don't", "not", "isn't"], answer: 0 },
+            { id: "A1-15", konstrukt: "Imperativ", bereich: "G", q: "Please _____ the window. It's cold.", options: ["closes", "closing", "close", "closed"], answer: 2 },
+            { id: "A1-16", konstrukt: "Present Simple", bereich: "G", q: "The nurses _____ a break at 10 a.m.", options: ["have", "has", "having", "haves"], answer: 0 },
+            // Korrigiert (C-12): vorher waren "on" und "under" ebenfalls richtig
+            { id: "A1-17", konstrukt: "Präpositionen des Ortes", bereich: "W", q: "I can't find my book. – Look, it's _____ your bag!", options: ["in", "of", "at", "to"], answer: 0 },
+            { id: "A1-18", konstrukt: "Fragewörter", bereich: "G", q: "_____ are you from?", options: ["Where", "What", "Who", "When"], answer: 0 },
+            { id: "A1-19", konstrukt: "Verneinung mit do/does", bereich: "G", q: "I don't _____ a car.", options: ["have", "has", "having", "had"], answer: 0 },
+            { id: "A1-20", konstrukt: "Leseverstehen", bereich: "L", q: "Read the text.\n\"My favourite colour is blue. I wear a blue shirt every Friday.\"\n\nQuestion: What does the writer wear on Fridays?", options: ["A blue shirt", "A red hat", "Blue shoes", "Green trousers"], answer: 0 }
+        ],
+        [ // Level 1: A2
+            { id: "A2-H1", konstrukt: "Hörverstehen", bereich: "H", q: "Listen to the message from the doctor's surgery.\n\nQuestion: When is the new appointment?", audioText: "Hello Mr Bauer. This is Dr Smith's surgery. We need to move your appointment from Tuesday to Thursday at 10 a.m.", options: ["Tuesday at 10 a.m.", "Thursday at 10 a.m.", "Friday at 9 a.m.", "Monday at 10 a.m."], answer: 1 },
+            { id: "A2-H2", konstrukt: "Hörverstehen", bereich: "H", q: "Listen to the weather forecast.\n\nQuestion: What will the weather be like in the late afternoon?", audioText: "Good morning! Today will start sunny, but expect heavy rain and strong winds in the late afternoon.", options: ["Sunny and warm", "Snowy and cold", "Heavy rain and strong winds", "Cloudy without rain"], answer: 2 },
+            { id: "A2-H3", konstrukt: "Hörverstehen", bereich: "H", q: "Listen to the shop announcement.\n\nQuestion: What are shoppers asked to do?", audioText: "Attention, shoppers. Our shop will close in fifteen minutes. Please bring your purchases to the checkouts at the front.", options: ["Leave without paying", "Go to the checkouts at the front", "Visit the second floor", "Wait for thirty minutes"], answer: 1 },
+            { id: "A2-01", konstrukt: "Past Simple", bereich: "G", q: "I _____ my homework yesterday evening.", options: ["do", "did", "done", "doing"], answer: 1 },
+            { id: "A2-02", konstrukt: "Past Simple: Fragen und Verneinung", bereich: "G", q: "Did you _____ the new film last night?", options: ["watch", "watched", "watches", "watching"], answer: 0 },
+            { id: "A2-03", konstrukt: "Steigerung", bereich: "G", q: "My house is _____ than yours.", options: ["big", "bigger", "biggest", "more big"], answer: 1 },
+            { id: "A2-04", konstrukt: "some/any", bereich: "G", q: "There aren't _____ apples left in the basket.", options: ["some", "any", "no", "much"], answer: 1 },
+            { id: "A2-05", konstrukt: "Past Simple (unregelmäßige Verben)", bereich: "G", q: "They _____ to London last summer.", options: ["go", "went", "goed", "gone"], answer: 1 },
+            { id: "A2-06", konstrukt: "Steigerung", bereich: "G", q: "She is the _____ student in the classroom.", options: ["tall", "taller", "tallest", "more tall"], answer: 2 },
+            { id: "A2-07", konstrukt: "Past Simple: Fragen und Verneinung", bereich: "G", q: "Did he _____ his car last week?", options: ["sell", "sold", "selling", "sells"], answer: 0 },
+            // Korrigiert (C-16): vorher war "until" ebenfalls richtig
+            { id: "A2-08", konstrukt: "Past Continuous", bereich: "G", q: "I was reading a book _____ the phone rang.", options: ["when", "during", "since", "at"], answer: 0 },
+            { id: "A2-09", konstrukt: "Steigerung", bereich: "G", q: "This is the _____ book I have ever read.", options: ["bad", "worse", "worst", "most bad"], answer: 2 },
+            { id: "A2-10", konstrukt: "Past Simple: Fragen und Verneinung", bereich: "G", q: "We didn't _____ any mistakes in the invoice.", options: ["make", "made", "making", "makes"], answer: 0 },
+            { id: "A2-11", konstrukt: "Steigerung", bereich: "G", q: "Could you run a bit _____?", options: ["fast", "faster", "fastest", "more fast"], answer: 1 },
+            // Korrigiert (C-13): vorher war "took" ebenfalls richtig
+            { id: "A2-12", konstrukt: "Present Continuous", bereich: "G", q: "He usually walks, but today he _____ the bus.", options: ["is taking", "are taking", "take", "taking"], answer: 0 },
+            { id: "A2-13", konstrukt: "Verbgebrauch (agree)", bereich: "G", q: "I don't _____ with your opinion.", options: ["agree", "am agree", "agreeing", "agreed"], answer: 0 },
+            { id: "A2-14", konstrukt: "Präpositionen nach Verben", bereich: "W", q: "We talked _____ our plans for the weekend.", options: ["for", "about", "with", "to"], answer: 1 },
+            { id: "A2-15", konstrukt: "Past Continuous", bereich: "G", q: "She _____ TV when he arrived.", options: ["was watching", "were watching", "watches", "is watching"], answer: 0 },
+            { id: "A2-16", konstrukt: "Present Perfect (just/yet)", bereich: "G", q: "I have _____ finished my homework.", options: ["just", "yet", "ever", "still"], answer: 0 },
+            { id: "A2-17", konstrukt: "Modalverben (mustn't/don't have to)", bereich: "G", q: "You _____ smoke in the hospital.", options: ["mustn't", "don't have to", "needn't", "aren't"], answer: 0 },
+            // Von B1 nach A2 verschoben (C-08): Kernstrukturen der Stufe A2
+            { id: "A2-18", konstrukt: "Bedingungssatz Typ 1", bereich: "G", q: "If it rains tomorrow, we _____ stay at home.", options: ["will", "would", "did", "stay"], answer: 0 },
+            { id: "A2-19", konstrukt: "Present Perfect (ever)", bereich: "G", q: "Have you ever _____ to Australia?", options: ["be", "went", "been", "going"], answer: 2 }
+        ],
+        [ // Level 2: B1
+            // Hörtexte neu (C-09): Lösung umschrieben statt wörtlich, Distraktoren aus dem Hörtext
+            { id: "B1-H1", konstrukt: "Hörverstehen", bereich: "H", q: "Listen to the voicemail.\n\nQuestion: What does Mark want Sarah to do?", audioText: "Hi Sarah, it's Mark from accounting. I've just looked at invoice 402, and I think the tax amount is wrong. Could you check it and send me a corrected version before twelve? The delivery date is fine, by the way.", options: ["Check the delivery date on the invoice", "Send him a corrected invoice before noon", "Pay invoice 402 today", "Call him back after twelve"], answer: 1 },
+            { id: "B1-H2", konstrukt: "Hörverstehen", bereich: "H", q: "Listen to the message from the doctor's practice.\n\nQuestion: Why is the practice calling the patient?", audioText: "Good afternoon, this is the reception at Westfield Medical Practice. Unfortunately, Dr Patel is ill this week, so your appointment on Wednesday has to be moved. You can see Dr Moore on the same day at four instead, or wait until Dr Patel is back next Monday. Please call us to let us know.", options: ["Because Dr Moore is ill this week", "Because the practice is closed on Wednesday", "Because the patient's doctor cannot see them as planned", "Because the patient missed an appointment on Monday"], answer: 2 },
+            { id: "B1-H3", konstrukt: "Hörverstehen", bereich: "H", q: "Listen to the team update.\n\nQuestion: What should the team do today?", audioText: "Good morning, everyone. As our project manager is off sick today, we won't have the strategy meeting this morning. We'll meet on Friday at two instead, so please use today's time to work on your own tasks.", options: ["Hold the strategy meeting without the manager", "Work on their individual tasks", "Visit the project manager", "Prepare a presentation for Friday morning"], answer: 1 },
+            { id: "B1-01", konstrukt: "Gerundium nach Präposition", bereich: "G", q: "Dear Ms Lee, thank you for your offer. I am looking forward _____ from you.", options: ["to hear", "hear", "to hearing", "hearing"], answer: 2 },
+            { id: "B1-02", konstrukt: "Present Perfect (since/for)", bereich: "G", q: "She _____ in this town for ten years.", options: ["live", "lives", "is living", "has lived"], answer: 3 },
+            { id: "B1-03", konstrukt: "Indirekte Fragen", bereich: "G", q: "Excuse me, could you tell me where _____? – Yes, it's on the second floor.", options: ["is the reception", "the reception is", "is reception", "reception is"], answer: 1 },
+            { id: "B1-04", konstrukt: "Adjektive auf -ed/-ing", bereich: "W", q: "I was very _____ when I heard the good news.", options: ["excited", "exciting", "excite", "excites"], answer: 0 },
+            { id: "B1-05", konstrukt: "Passiv (Vergangenheit)", bereich: "G", q: "The window _____ broken by the children.", options: ["are", "were", "was", "have been"], answer: 2 },
+            // Korrigiert (C-15): Kontext ergänzt, vorher waren "mustn't" und "shouldn't" ebenfalls vertretbar
+            { id: "B1-06", konstrukt: "Modalverben (mustn't/don't have to)", bereich: "G", q: "Uniforms are optional at our school, so you _____ wear one.", options: ["mustn't", "don't have to", "have to", "haven't to"], answer: 1 },
+            { id: "B1-07", konstrukt: "Präpositionen nach Adjektiven", bereich: "W", q: "She is afraid _____ spiders.", options: ["of", "about", "for", "with"], answer: 0 },
+            { id: "B1-08", konstrukt: "Gerundium nach Verben", bereich: "G", q: "I suggest _____ an umbrella. It looks like rain.", options: ["taking", "to take", "take", "took"], answer: 0 },
+            { id: "B1-09", konstrukt: "Present Perfect (since/for)", bereich: "G", q: "He has lived here _____ he was a child.", options: ["since", "for", "during", "in"], answer: 0 },
+            { id: "B1-10", konstrukt: "Bedingungssatz Typ 2", bereich: "G", q: "They would travel more if they _____ more money.", options: ["have", "had", "will have", "would have"], answer: 1 },
+            { id: "B1-11", konstrukt: "Präpositionen nach Adjektiven", bereich: "W", q: "Are you interested _____ working in our team?", options: ["to", "in", "of", "for"], answer: 1 },
+            { id: "B1-12", konstrukt: "so/too", bereich: "G", q: "The music was _____ loud that I couldn't sleep.", options: ["too", "very", "so", "much"], answer: 2 },
+            { id: "B1-13", konstrukt: "Präpositionen nach Verben", bereich: "W", q: "We need to deal _____ this customer complaint quickly.", options: ["to", "with", "about", "for"], answer: 1 },
+            { id: "B1-14", konstrukt: "Bedingungssatz Typ 1", bereich: "G", q: "If I have time, I _____ you.", options: ["will help", "would help", "helped", "helping"], answer: 0 },
+            { id: "B1-15", konstrukt: "Passiv (Vergangenheit)", bereich: "G", q: "The new hospital wing _____ opened last year.", options: ["was", "is", "has", "were"], answer: 0 },
+            { id: "B1-16", konstrukt: "Indirekte Rede", bereich: "G", q: "When I was in London, a tourist asked me if I _____ the way to the station.", options: ["knew", "know", "knowing", "known"], answer: 0 },
+            { id: "B1-17", konstrukt: "Präpositionen nach Adjektiven", bereich: "W", q: "She is very good _____ playing tennis.", options: ["at", "in", "on", "with"], answer: 0 },
+            // Von A2 nach B1 verschoben (C-08): Present Perfect Progressive
+            { id: "B1-18", konstrukt: "Present Perfect Progressive", bereich: "G", q: "We have been waiting _____ two hours.", options: ["since", "for", "from", "during"], answer: 1 },
+            // Von C1 nach B1 verschoben (C-08)
+            { id: "B1-19", konstrukt: "Gerundium nach Präposition", bereich: "W", q: "She succeeded in _____ the project on time.", options: ["completing", "complete", "completed", "to complete"], answer: 0 }
+        ],
+        [ // Level 3: B2
+            { id: "B2-H1", konstrukt: "Hörverstehen", bereich: "H", q: "Listen to the business negotiation.\n\nQuestion: What does the speaker want before agreeing to the deal?", audioText: "Thank you for the revised offer. A five per cent discount is certainly a step in the right direction. However, with our current budget, we could only go ahead if you were prepared to cover the shipping costs as well. Otherwise, we would have to look at other suppliers.", options: ["A discount of more than five per cent", "The supplier to pay for delivery", "More time to compare other suppliers", "A larger budget from their own company"], answer: 1 },
+            { id: "B2-H2", konstrukt: "Hörverstehen", bereich: "H", q: "Listen to the staff announcement.\n\nQuestion: What is required of staff who work from home?", audioText: "From next month, staff in the administration team may work from home on up to three days a week. The only condition is that everyone can be reached between ten and two, as this is when most patients and colleagues call. Requests should be discussed with your team leader.", options: ["They must work from home three days a week", "They must be available during a fixed period of the day", "They must only answer patients' calls in the morning", "They need written permission from the HR department"], answer: 1 },
+            { id: "B2-H3", konstrukt: "Hörverstehen", bereich: "H", q: "Listen to the product review.\n\nQuestion: What do many users criticise about the smartwatch?", audioText: "The new smartwatch got plenty of attention when it was launched, but early reviews have been rather mixed. Most users like the design and the price, but many complain that the battery barely lasts a day and that setting the watch up is far from easy.", options: ["Its design and its price", "How long it runs before it needs charging", "That it got too much attention in the media", "That it was launched too early"], answer: 1 },
+            { id: "B2-01", konstrukt: "Past Perfect", bereich: "G", q: "By the time we arrived, the film _____.", options: ["started", "has started", "had started", "was starting"], answer: 2 },
+            // Korrigiert (C-14): "repaired" stand vorher zusätzlich im Satz
+            { id: "B2-02", konstrukt: "Passiv (Verlaufsform)", bereich: "G", q: "The car _____ at the moment, so I'm taking the bus.", options: ["is repairing", "is being repaired", "repairs", "has repaired"], answer: 1 },
+            { id: "B2-03", konstrukt: "Konjunktionen (unless)", bereich: "G", q: "Unless you _____, you will miss the beginning.", options: ["hurry up", "don't hurry up", "will hurry up", "hurried up"], answer: 0 },
+            { id: "B2-04", konstrukt: "Gerundium nach Verben", bereich: "G", q: "I strongly advise _____ a lawyer.", options: ["to consult", "consult", "consulting", "consulted"], answer: 2 },
+            { id: "B2-05", konstrukt: "Relativsätze", bereich: "G", q: "The man _____ car was stolen called the police.", options: ["who's", "whose", "which", "that"], answer: 1 },
+            { id: "B2-06", konstrukt: "Future Perfect", bereich: "G", q: "By this time next year, I _____ my training.", options: ["will have finished", "have finished", "finish", "am finishing"], answer: 0 },
+            { id: "B2-07", konstrukt: "Modale Ausdrücke (had better)", bereich: "G", q: "You had better _____ a doctor immediately.", options: ["to see", "seeing", "see", "saw"], answer: 2 },
+            { id: "B2-08", konstrukt: "be used to + -ing", bereich: "G", q: "We are used to _____ early in the morning.", options: ["get up", "getting up", "got up", "be getting up"], answer: 1 },
+            { id: "B2-09", konstrukt: "Gegensätze (despite)", bereich: "G", q: "Despite _____ hard, he failed the exam.", options: ["study", "to study", "studying", "studied"], answer: 2 },
+            { id: "B2-10", konstrukt: "Phrasal Verbs", bereich: "W", q: "The match was called _____ because of heavy rain.", options: ["off", "out", "away", "down"], answer: 0 },
+            { id: "B2-11", konstrukt: "Gerundium oder Infinitiv (remember)", bereich: "G", q: "I remember _____ Paris when I was a child.", options: ["visit", "to visit", "visiting", "visited"], answer: 2 },
+            { id: "B2-12", konstrukt: "Bedingungssatz Typ 3", bereich: "G", q: "If I _____ about the traffic, I would have taken another route.", options: ["knew", "had known", "would know", "have known"], answer: 1 },
+            { id: "B2-13", konstrukt: "Phrasal Verbs", bereich: "W", q: "We need to figure _____ how to solve this issue.", options: ["out", "up", "in", "off"], answer: 0 },
+            { id: "B2-14", konstrukt: "Präpositionen nach Nomen", bereich: "W", q: "The new software had a major impact _____ our sales figures.", options: ["to", "in", "on", "for"], answer: 2 },
+            { id: "B2-15", konstrukt: "Adverbien (hardly)", bereich: "W", q: "She spoke so fast that I could _____ understand her.", options: ["hardly", "hard", "almost", "nearly"], answer: 0 },
+            { id: "B2-16", konstrukt: "Wunschsätze (wish)", bereich: "G", q: "I wish I _____ more free time.", options: ["had", "have", "will have", "having"], answer: 0 },
+            { id: "B2-17", konstrukt: "Präpositionen nach Verben", bereich: "W", q: "She accused him _____ stealing the money.", options: ["of", "for", "with", "about"], answer: 0 },
+            { id: "B2-18", konstrukt: "have something done", bereich: "G", q: "We had our house _____ last year.", options: ["painted", "paint", "painting", "to paint"], answer: 0 },
+            { id: "B2-19", konstrukt: "Gerundium nach festen Ausdrücken", bereich: "G", q: "It's no use _____ about it now.", options: ["complaining", "complain", "to complain", "complained"], answer: 0 },
+            // Von C1 nach B2 verschoben (C-08)
+            { id: "B2-20", konstrukt: "Passiv (Berichtsstil)", bereich: "G", q: "The painting _____ to be a masterpiece.", options: ["is considered", "considered", "is considering", "considers"], answer: 0 },
+            { id: "B2-21", konstrukt: "Gerundium im Passiv", bereich: "G", q: "She insisted on _____ informed about every detail.", options: ["being", "be", "to be", "been"], answer: 0 },
+            // Von C2 nach B2 verschoben (C-08)
+            { id: "B2-22", konstrukt: "Wortschatz (Adjektive)", bereich: "W", q: "Her translation was absolutely _____; not a single error was found.", options: ["flawless", "harmless", "blameless", "careless"], answer: 0 },
+            { id: "B2-23", konstrukt: "Präpositionen nach Verben", bereich: "W", q: "Ensure your work complies _____ all safety standards.", options: ["with", "to", "by", "in"], answer: 0 }
+        ],
+        [ // Level 4: C1
+            { id: "C1-H1", konstrukt: "Hörverstehen", bereich: "H", q: "Listen to the economic commentary.\n\nQuestion: What is the speaker's view on cutting interest rates now?", audioText: "A number of analysts are calling for interest rates to be cut straight away in order to boost growth. What they tend to overlook, though, is that prices for services are still rising steadily. Cutting rates now could therefore turn out to be a mistake, and it might be wiser to wait a few more months.", options: ["It is the best way to stop prices from rising", "It may come too early because inflation has not gone away", "It is necessary because growth has stopped completely", "It should only affect the services sector"], answer: 1 },
+            { id: "C1-H2", konstrukt: "Hörverstehen", bereich: "H", q: "Listen to the hospital announcement.\n\nQuestion: How is the hospital responding to its difficulties?", audioText: "Rather than cutting jobs across the board, the hospital's management has decided to stop recruiting for the time being and to merge two of its smaller departments. The aim is to keep experienced staff, even if this means that some employees will have to change their place of work.", options: ["By cutting jobs in every department", "By hiring more experienced staff", "By combining departments and not filling vacancies", "By closing its smaller departments completely"], answer: 2 },
+            { id: "C1-H3", konstrukt: "Hörverstehen", bereich: "H", q: "Listen to the media critique.\n\nQuestion: What is the speaker's main criticism of the documentary?", audioText: "The documentary claims to give a balanced picture of the energy crisis. Yet almost all of the studies it quotes were paid for by the oil and gas industry, and alternative views hardly get a mention. As a result, viewers are gently steered towards the conclusion that fossil fuel subsidies are the only realistic short-term answer.", options: ["It gives too little information about the energy crisis", "It presents a one-sided view because of the sources it uses", "It openly argues against fossil fuel subsidies", "It is too difficult for ordinary viewers to follow"], answer: 1 },
+            { id: "C1-01", konstrukt: "Inversion", bereich: "G", q: "Not only _____ the exam, but she also got the highest score.", options: ["she passed", "did she pass", "passed she", "she did pass"], answer: 1 },
+            // Korrigiert (C-17): "is" ist im britischen Englisch ebenfalls richtig und wurde entfernt
+            { id: "C1-02", konstrukt: "Konjunktiv (subjunctive)", bereich: "G", q: "It is vital that the truth _____ revealed.", options: ["be", "being", "to be", "been"], answer: 0 },
+            { id: "C1-03", konstrukt: "Bedingungssatz Typ 3", bereich: "G", q: "Had I known about the danger, I _____ there.", options: ["would not go", "will not go", "did not go", "would not have gone"], answer: 3 },
+            { id: "C1-04", konstrukt: "Phrasal Verbs", bereich: "W", q: "We must _____ the underlying causes of the conflict.", options: ["look up", "look into", "look over", "look after"], answer: 1 },
+            { id: "C1-05", konstrukt: "Bedingungssatz ohne if", bereich: "G", q: "Should you _____ any questions about your appointment, please contact our reception.", options: ["need", "requiring", "have", "required"], answer: 2 },
+            { id: "C1-06", konstrukt: "would rather / it's time + Vergangenheit", bereich: "G", q: "I'd rather you _____ smoke in this room.", options: ["didn't", "haven't", "won't", "doesn't"], answer: 0 },
+            { id: "C1-07", konstrukt: "would rather / it's time + Vergangenheit", bereich: "G", q: "It's high time we _____ our lifestyle.", options: ["change", "changing", "changed", "have changed"], answer: 2 },
+            { id: "C1-08", konstrukt: "Phrasal Verbs", bereich: "W", q: "She takes _____ her mother in both looks and temperament.", options: ["after", "over", "up", "on"], answer: 0 },
+            { id: "C1-09", konstrukt: "Gerundium im Passiv", bereich: "G", q: "He objected _____ treated like a child.", options: ["to being", "to be", "against being", "for being"], answer: 0 },
+            { id: "C1-10", konstrukt: "Inversion", bereich: "G", q: "Rarely _____ such dedication in a young athlete.", options: ["we have seen", "have we seen", "we saw", "we see"], answer: 1 },
+            { id: "C1-11", konstrukt: "Feste Wendungen", bereich: "W", q: "We are on the _____ of a major breakthrough.", options: ["corner", "verge", "surface", "border"], answer: 1 },
+            { id: "C1-12", konstrukt: "Feste Wendungen", bereich: "W", q: "His careless actions put his entire career in _____.", options: ["jeopardy", "caution", "warning", "alarm"], answer: 0 },
+            { id: "C1-13", konstrukt: "Präpositionen nach Verben", bereich: "W", q: "Please refrain _____ talking during the performance.", options: ["to", "from", "of", "about"], answer: 1 },
+            { id: "C1-14", konstrukt: "Phrasal Verbs", bereich: "W", q: "We need to _____ out all the misunderstandings.", options: ["iron", "flatten", "press", "fold"], answer: 0 },
+            { id: "C1-15", konstrukt: "Inversion", bereich: "G", q: "Under no circumstances _____ this door be opened.", options: ["should", "it should", "should it", "ought"], answer: 0 },
+            { id: "C1-16", konstrukt: "Feste Wendungen", bereich: "W", q: "The company is bound _____ bankrupt.", options: ["to go", "going", "go", "gone"], answer: 0 },
+            // Neu (C-19): ersetzt "on the verge of tears", das die Lösung von C1-11 verriet
+            { id: "C1-17", konstrukt: "Feste Wendungen", bereich: "W", q: "The proposal was rejected _____ the grounds that it was too expensive.", options: ["on", "for", "by", "at"], answer: 0 },
+            // Von B2 nach C1 verschoben (C-08): Inversion
+            { id: "C1-18", konstrukt: "Inversion", bereich: "G", q: "No sooner had we sat down _____ the phone rang.", options: ["than", "when", "then", "that"], answer: 0 },
+            // Von C2 nach C1 verschoben (C-08)
+            { id: "C1-19", konstrukt: "Präpositionen nach Adjektiven", bereich: "W", q: "He is prone _____ exaggeration when telling stories.", options: ["to", "for", "of", "with"], answer: 0 },
+            { id: "C1-20", konstrukt: "Feste Wendungen", bereich: "W", q: "That objection is entirely beside the _____.", options: ["point", "matter", "issue", "subject"], answer: 0 }
+        ],
+        [ // Level 5: C2
+            { id: "C2-H1", konstrukt: "Hörverstehen", bereich: "H", q: "Listen to the academic commentary.\n\nQuestion: How does the speaker judge Professor Hale's critique?", audioText: "Professor Hale presents her attack on utilitarian ethics as a bold new theory. On closer inspection, however, it is less a genuine innovation than a clever rhetorical move: the values she claims to have abandoned are quietly reintroduced, merely dressed up as common sense.", options: ["As an original theory that changes the debate", "As persuasive wording that hides assumptions she still relies on", "As a common-sense approach that avoids theory altogether", "As an attack that has been widely misunderstood"], answer: 1 },
+            { id: "C2-H2", konstrukt: "Hörverstehen", bereich: "H", q: "Listen to the political analysis.\n\nQuestion: According to the speaker, what mainly led to the improvement in relations?", audioText: "It is tempting to credit the easing of tensions between the two countries to skilful diplomacy alone. That reading, however, ignores the fact that both governments were running out of money and simply could no longer afford to fund conflicts abroad. The diplomats, in other words, were pushing at a door that economics had already opened.", options: ["Skilful negotiations by experienced diplomats", "Economic pressure that made conflict too expensive", "A change in public opinion in both countries", "Pressure from other countries to end the conflicts"], answer: 1 },
+            { id: "C2-H3", konstrukt: "Hörverstehen", bereich: "H", q: "Listen to the theatre review.\n\nQuestion: What does the reviewer suggest about the play?", audioText: "On the surface, the play looks like a simple satire of greedy executives, and many critics have treated it as such. But the longer it goes on, the clearer it becomes that the characters' small compromises are uncomfortably close to our own. The real target is not the boardroom, but the audience.", options: ["It is mainly a comedy about greedy managers", "It makes the audience question their own behaviour", "Critics have praised it for being uncomfortable", "It is set entirely in a company boardroom"], answer: 1 },
+            { id: "C2-01", konstrukt: "Inversion", bereich: "G", q: "Scarcely _____ the house when it started to pour.", options: ["had we left", "we had left", "we left", "did we leave"], answer: 0 },
+            { id: "C2-02", konstrukt: "Feste Wendungen", bereich: "W", q: "He paid _____ service to equality but never acted on it.", options: ["lip", "mouth", "word", "tongue"], answer: 0 },
+            { id: "C2-03", konstrukt: "Präpositionen nach Verben", bereich: "W", q: "Our success hinges _____ teamwork and dedication.", options: ["on", "in", "about", "with"], answer: 0 },
+            // Überarbeitet (C-08): prüft jetzt die Wendung "take it upon oneself" statt nur das Reflexivpronomen
+            { id: "C2-04", konstrukt: "Feste Wendungen", bereich: "W", q: "In the manager's absence, she took it _____ herself to lead the meeting.", options: ["upon", "over", "onto", "into"], answer: 0 },
+            { id: "C2-05", konstrukt: "Konzessive Satzmuster", bereich: "G", q: "Try as she _____, she couldn't open the jammed door.", options: ["should", "must", "shall", "might"], answer: 3 },
+            { id: "C2-06", konstrukt: "Präpositionen nach Adjektiven", bereich: "W", q: "The mission was doomed _____ failure from its inception.", options: ["to", "for", "at", "with"], answer: 0 },
+            { id: "C2-07", konstrukt: "Feste Wendungen", bereich: "W", q: "He took _____ at the remark about his appearance.", options: ["pity", "umbrage", "notice", "insult"], answer: 1 },
+            { id: "C2-08", konstrukt: "Kollokationen", bereich: "W", q: "The new regulations will inevitably _____ a heavy toll on small shops.", options: ["take", "make", "have", "do"], answer: 0 },
+            // Korrigiert (C-18): "of" ist ebenfalls richtig und wurde entfernt
+            { id: "C2-09", konstrukt: "Präpositionen nach Nomen", bereich: "W", q: "She has a natural knack _____ picking up languages.", options: ["for", "on", "about", "by"], answer: 0 },
+            { id: "C2-10", konstrukt: "Kollokationen", bereich: "W", q: "After hours of talks, the negotiations ground to a _____.", options: ["halt", "stop", "end", "close"], answer: 0 },
+            { id: "C2-11", konstrukt: "Phrasal Verbs", bereich: "W", q: "Their savings were slowly whittled _____ by rising costs.", options: ["away", "off", "out", "over"], answer: 0 },
+            { id: "C2-12", konstrukt: "Feste Wendungen", bereich: "W", q: "He loves playing devil's _____ during discussions.", options: ["advocate", "lawyer", "representative", "proxy"], answer: 0 },
+            { id: "C2-13", konstrukt: "Wortschatz (Adjektive)", bereich: "W", q: "His behaviour was completely _____, leaving everyone in shock.", options: ["reprehensible", "respectful", "receptive", "reluctant"], answer: 0 },
+            { id: "C2-14", konstrukt: "Phrasal Verbs", bereich: "W", q: "The politician managed to skirt _____ the issue.", options: ["around", "over", "through", "off"], answer: 0 },
+            { id: "C2-15", konstrukt: "Feste Wendungen", bereich: "W", q: "His comments were completely _____ the mark.", options: ["off", "out", "beyond", "below"], answer: 0 },
+            { id: "C2-16", konstrukt: "Kollokationen", bereich: "W", q: "She bears a _____ resemblance to her grandmother.", options: ["striking", "hitting", "punching", "smacking"], answer: 0 },
+            // Neu (C-08): ersetzen die nach B2/C1 verschobenen Aufgaben, damit der C2-Pool ausreicht
+            { id: "C2-17", konstrukt: "Bedingungssatz ohne if", bereich: "G", q: "_____ it not been for her quick thinking, the situation could have ended in disaster.", options: ["Had", "Were", "Should", "Did"], answer: 0 },
+            { id: "C2-18", konstrukt: "Kollokationen", bereich: "W", q: "The scandal dealt a severe _____ to the minister's reputation.", options: ["blow", "hit", "strike", "punch"], answer: 0 },
+            { id: "C2-19", konstrukt: "Inversion", bereich: "G", q: "Little _____ that his decision would change the company forever.", options: ["did he know", "he knew", "knew he", "he did know"], answer: 0 },
+            { id: "C2-20", konstrukt: "Wortschatz (Verben)", bereich: "W", q: "Her calm explanation did little to _____ the staff's fears.", options: ["allay", "alloy", "ally", "alley"], answer: 0 }
+        ]
+    ];
+
+    // Einstufung (C-01, C-02): nicht mehr über die Punktsumme, sondern über eine
+    // Fähigkeitsschätzung aus ALLEN Antworten des adaptiven Teils (Grammatik,
+    // Wortschatz, Lesen), wie bei adaptiven Tests üblich (Maximum-Likelihood mit
+    // Ratewahrscheinlichkeit 25 % und schwacher Vorannahme um B1).
+    // Skala: 0 = A1, 1 = A2, ... 5 = C2. Ein Schätzwert von z. B. 2,4 heißt:
+    // B1-Aufgaben werden überwiegend gelöst, B2-Aufgaben überwiegend noch nicht.
+    // Aus dem Standardfehler ergibt sich ein Bereich (Schätzwert ± 1 Standardfehler).
+    // Höraufgaben werden getrennt ausgewiesen und fließen hier nicht ein.
+    const RATEWAHRSCHEINLICHKEIT = 0.25;
+    const TRENNSCHAERFE = 2;
+    const VORANNAHME_MITTEL = 2.5;  // Mitte von B1
+    const VORANNAHME_STREUUNG = 2;  // bewusst schwach (2 Stufen)
+
+    function leereStatistik() {
+        return levelNames.map(() => ({ n: 0, r: 0 }));
+    }
+
+    function loesungswahrscheinlichkeit(theta, stufe) {
+        return RATEWAHRSCHEINLICHKEIT +
+            (1 - RATEWAHRSCHEINLICHKEIT) / (1 + Math.exp(-TRENNSCHAERFE * (theta - stufe)));
+    }
+
+    function begrenzeStufe(wert) {
+        return Math.max(0, Math.min(levelNames.length - 1, Math.floor(wert)));
+    }
+
+    // antworten: Array von { stufe, richtig } (nur adaptiver Teil, ohne Hören)
+    function ermittleNiveau(antworten) {
+        let theta = VORANNAHME_MITTEL;
+        let besteLL = -Infinity;
+        for (let i = 0; i <= 150; i++) {
+            const t = -1 + i * 0.05; // Raster von -1,0 bis 6,5
+            let ll = -((t - VORANNAHME_MITTEL) ** 2) / (2 * VORANNAHME_STREUUNG ** 2);
+            for (const a of antworten) {
+                const p = loesungswahrscheinlichkeit(t, a.stufe);
+                ll += Math.log(a.richtig ? p : 1 - p);
+            }
+            if (ll > besteLL) {
+                besteLL = ll;
+                theta = t;
+            }
+        }
+        // Standardfehler aus der Testinformation (3PL-Iteminformation + Vorannahme)
+        const c = RATEWAHRSCHEINLICHKEIT;
+        let information = 1 / VORANNAHME_STREUUNG ** 2;
+        for (const a of antworten) {
+            const p = loesungswahrscheinlichkeit(theta, a.stufe);
+            information += TRENNSCHAERFE ** 2 * ((p - c) ** 2 / (1 - c) ** 2) * ((1 - p) / p);
+        }
+        const standardfehler = 1 / Math.sqrt(information);
+        return {
+            theta: theta,
+            standardfehler: standardfehler,
+            stufe: begrenzeStufe(theta),
+            gesichert: theta >= 0,
+            untere: begrenzeStufe(theta - standardfehler),
+            obere: begrenzeStufe(theta + standardfehler)
+        };
+    }
+
+    // Adaptiver Schritt: richtig = eine Stufe höher, falsch = eine Stufe tiefer
+    function naechsteStufe(aktuell, richtig) {
+        if (richtig) return Math.min(aktuell + 1, levelNames.length - 1);
+        return Math.max(aktuell - 1, 0);
+    }
+
+    // Wählt eine noch nicht gestellte Aufgabe des gewünschten Typs (Hören oder
+    // nicht) auf der aktuellen Stufe; ist dort nichts mehr frei, auf der
+    // nächstgelegenen Stufe (zuerst darunter, dann darüber).
+    // Testplan (C-11): Bevorzugt werden Aufgaben zu Konstrukten, die in diesem
+    // Durchlauf noch nicht vorkamen (z. B. nicht zweimal since/for). Erst wenn
+    // es auf der Stufe keine solche Aufgabe mehr gibt, ist eine Wiederholung erlaubt.
+    function waehleAufgabe(stufe, hoeren, benutzt, benutzteKonstrukte = new Set()) {
+        const reihenfolge = [stufe];
+        for (let d = 1; d < levelNames.length; d++) {
+            if (stufe - d >= 0) reihenfolge.push(stufe - d);
+            if (stufe + d < levelNames.length) reihenfolge.push(stufe + d);
+        }
+        for (const s of reihenfolge) {
+            const frei = questionBank[s].filter(f => Boolean(f.audioText) === hoeren && !benutzt.has(f.id));
+            if (frei.length > 0) {
+                const neueKonstrukte = frei.filter(f => !benutzteKonstrukte.has(f.konstrukt));
+                const kandidaten = neueKonstrukte.length > 0 ? neueKonstrukte : frei;
+                return { frage: kandidaten[Math.floor(Math.random() * kandidaten.length)], stufe: s };
+            }
+        }
+        // Theoretischer Notfall (alle Aufgaben verbraucht): Wiederholung zulassen
+        const alle = questionBank[stufe].filter(f => Boolean(f.audioText) === hoeren);
+        return { frage: alle[Math.floor(Math.random() * alle.length)], stufe: stufe };
+    }
+
+    // Fisher-Yates-Mischung (C-03): Antwortoptionen in zufälliger Reihenfolge
+    function mische(liste) {
+        const kopie = liste.slice();
+        for (let i = kopie.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [kopie[i], kopie[j]] = [kopie[j], kopie[i]];
+        }
+        return kopie;
+    }
+
+    // ==== LOGIK ENDE ====
+
     let studentData = { name: "", schoolClass: "", year: "" };
+
+    // Nachteilsausgleich (C-26): Mit dem Link ...index.html?hoeren=aus läuft der
+    // Test ohne Höraufgaben (21 statt 25 Aufgaben). Den Link gibt die Lehrkraft
+    // gezielt weiter; das wird im Ergebnis vermerkt.
+    const hoerteilAktiv = new URLSearchParams(window.location.search).get("hoeren") !== "aus";
+    // Feste Positionen der 4 Höraufgaben (0-basiert = Fragen 5, 11, 17, 23), damit
+    // alle Lernenden gleich viele Höraufgaben bekommen (C-06)
+    const HOER_POSITIONEN = hoerteilAktiv ? [4, 10, 16, 22] : [];
+    const maxQuestions = hoerteilAktiv ? 25 : 21;
+    const MAX_WIEDERGABEN = 2;
+
+    // Optional (C-05): ID einer zusätzlichen Forms-Frage vom Typ "Lange Antwort"
+    // für das Kompetenzprofil und das Antwortprotokoll, z. B. "r1234abcd...".
+    // Leer = es werden nur die bisherigen Felder übermittelt (Formular bleibt
+    // unverändert kompatibel). Die ID steht im vorausgefüllten Forms-Link.
+    const PROFIL_FELD_ID = "";
 
     let currentLevel = 2; // Start Level: B1
     let questionsAsked = 0;
-    const maxQuestions = 25; 
     let currentQuestionData = null;
+    let currentQuestionLevel = 2;
     let usedQuestions = new Set();
     let totalScore = 0;
     let testLaeuft = false;   // steuert die Warnung beim Verlassen der Seite
-    let antwortGesperrt = false; // verhindert Doppelklicks auf eine Antwort
-    
-    const maxPossibleScore = 288; 
+    let antwortGesperrt = false; // verhindert doppelte Wertung derselben Aufgabe
+    const EINGABESPERRE_MS = 400;
+    let eingabeSperreTimer = null;
+    let ergebnisBereit = false;
+    let uebermittlungGeoeffnet = false;
+    let wiedergaben = 0;
+    let keineEnglischeStimme = false;
+    let startZeit = null;
+    const protokoll = []; // je Aufgabe: id, konstrukt, stufe, bereich, richtig, weissNicht, wiedergaben, alsText
+    const benutzteKonstrukte = new Set();
+
+    // "Ich weiß es nicht" (C-10): eigener Wert, wird als nicht gelöst gewertet
+    const WEISS_NICHT = "weissnicht";
+
+    // Mehrfachdurchläufe erkennbar machen (C-32): zufällige Durchlauf-ID und
+    // Zähler der Versuche auf diesem Gerät (nur im Browser gespeichert)
+    const durchlaufId = Math.random().toString(36).slice(2, 8).toUpperCase();
+    let versuchAufGeraet = 1;
+    let startUhrzeit = "";
 
     // Prüft einmalig, ob der Browser die Web Speech API unterstützt
     const sprachausgabeVerfuegbar =
         typeof window.speechSynthesis !== "undefined" &&
         typeof window.SpeechSynthesisUtterance !== "undefined";
+
+    // Ohne Sprachausgabe werden Hörtexte als Text gezeigt (und so vermerkt)
+    let textStattTon = !sprachausgabeVerfuegbar;
 
     // Stimmen werden in manchen Browsern asynchron geladen - hier vorwärmen
     if (sprachausgabeVerfuegbar) {
@@ -206,191 +714,141 @@
         window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
     }
 
-    const questionBank = [
-        [ // Level 0: A1 (inkl. 3 Hörverstehens-Fragen)
-            { q: "LISTEN TO THE ANNOUNCEMENT:\n\nQuestion: What time does the train leave?", audioText: "Attention please. The train to Berlin leaves at three o'clock from platform two.", options: ["At 2 o'clock", "At 3 o'clock", "At 4 o'clock", "At 10 o'clock"], answer: 1 },
-            { q: "LISTEN TO THE PHONE MESSAGE:\n\nQuestion: What is Tom's phone number?", audioText: "Hello, my name is Tom. My phone number is 0-7-9-4-2-6-1. Please call me back.", options: ["0794261", "0794162", "0784261", "0694261"], answer: 0 },
-            { q: "LISTEN TO THE ORDER IN A CAFÉ:\n\nQuestion: What does the customer order?", audioText: "Good morning. I would like a large black coffee and a croissant, please.", options: ["Tea and cake", "A small milk coffee", "A large black coffee and a croissant", "Water and a sandwich"], answer: 2 },
-            { q: "I _____ from Germany.", options: ["is", "am", "are", "be"], answer: 1 },
-            { q: "She _____ to school by bike every day.", options: ["go", "goes", "going", "gone"], answer: 1 },
-            { q: "_____ you have a spare pen?", options: ["Do", "Are", "Does", "Is"], answer: 0 },
-            { q: "Our English class is _____ Monday.", options: ["in", "at", "on", "by"], answer: 2 },
-            { q: "The cat is sleeping _____ the table.", options: ["under", "between", "next", "in"], answer: 0 },
-            { q: "The film starts _____ 8 o'clock.", options: ["in", "on", "at", "to"], answer: 2 },
-            { q: "He _____ not like drinking coffee.", options: ["do", "does", "is", "are"], answer: 1 },
-            { q: "_____ you like an apple?", options: ["Will", "Do", "Would", "Are"], answer: 2 },
-            { q: "This backpack is _____.", options: ["mine", "my", "me", "I"], answer: 0 },
-            { q: "_____ old are you?", options: ["How", "What", "Who", "Which"], answer: 0 },
-            { q: "I usually _____ up at 7 AM.", options: ["get", "gets", "getting", "got"], answer: 0 },
-            { q: "They _____ from Spain, they are from Italy.", options: ["doesn't", "don't", "aren't", "isn't"], answer: 2 },
-            { q: "The weather today is _____ nice.", options: ["much", "very", "many", "lot"], answer: 1 },
-            { q: "My brother _____ eats fish.", options: ["never", "don't", "not", "isn't"], answer: 0 },
-            { q: "Please _____ the window, it's cold.", options: ["closes", "closing", "close", "closed"], answer: 2 },
-            { q: "We _____ breakfast at 8 AM.", options: ["have", "has", "having", "haves"], answer: 0 },
-            { q: "The book is _____ the bag.", options: ["in", "on", "at", "under"], answer: 0 },
-            { q: "_____ are you from?", options: ["Where", "What", "Who", "When"], answer: 0 },
-            { q: "I don't _____ a car.", options: ["have", "has", "having", "had"], answer: 0 },
-            { q: "READ THE TEXT:\n\"My favorite color is blue. I wear a blue shirt every Friday.\"\n\nQuestion: What does he wear on Friday?", options: ["A blue shirt", "A red hat", "Blue shoes", "Green trousers"], answer: 0 }
-        ],
-        [ // Level 1: A2 (inkl. 3 Hörverstehens-Fragen)
-            { q: "LISTEN TO THE DOCTOR'S OFFICE:\n\nQuestion: When is the new appointment?", audioText: "Hello Mr. Bauer. This is Dr. Smith's office. We need to reschedule your appointment from Tuesday to Thursday at 10 AM.", options: ["Tuesday at 10 AM", "Thursday at 10 AM", "Friday at 9 AM", "Monday at 10 AM"], answer: 1 },
-            { q: "LISTEN TO THE WEATHER FORECAST:\n\nQuestion: What will the weather be like in the late afternoon?", audioText: "Good morning! Today will start sunny, but expect heavy rain and strong winds in the late afternoon.", options: ["Sunny and warm", "Snowy and cold", "Heavy rain and strong winds", "Cloudy without rain"], answer: 2 },
-            { q: "LISTEN TO THE STORE ANNOUNCEMENT:\n\nQuestion: What are shoppers asked to do?", audioText: "Attention shoppers. Our store will close in fifteen minutes. Please bring your purchases to the checkouts at the front.", options: ["Leave without paying", "Go to the checkouts at the front", "Visit the second floor", "Wait for thirty minutes"], answer: 1 },
-            { q: "I _____ my homework yesterday evening.", options: ["do", "did", "done", "doing"], answer: 1 },
-            { q: "Did you _____ the new film last night?", options: ["watch", "watched", "watches", "watching"], answer: 0 },
-            { q: "My house is _____ than yours.", options: ["big", "bigger", "biggest", "more big"], answer: 1 },
-            { q: "There aren't _____ apples left in the basket.", options: ["some", "any", "no", "much"], answer: 1 },
-            { q: "They _____ to London last summer.", options: ["go", "went", "goed", "gone"], answer: 1 },
-            { q: "She is the _____ student in the classroom.", options: ["tall", "taller", "tallest", "more tall"], answer: 2 },
-            { q: "Did he _____ his car last week?", options: ["sell", "sold", "selling", "sells"], answer: 0 },
-            { q: "I was reading a book _____ the phone rang.", options: ["while", "when", "during", "until"], answer: 1 },
-            { q: "This is the _____ book I have ever read.", options: ["bad", "worse", "worst", "most bad"], answer: 2 },
-            { q: "We didn't _____ any mistakes in the test.", options: ["make", "made", "making", "makes"], answer: 0 },
-            { q: "Could you run a bit _____?", options: ["fast", "faster", "fastest", "more fast"], answer: 1 },
-            { q: "He usually walks, but today he _____ the bus.", options: ["take", "takes", "is taking", "took"], answer: 2 },
-            { q: "We have been waiting _____ two hours.", options: ["since", "for", "from", "during"], answer: 1 },
-            { q: "I don't _____ with your opinion.", options: ["agree", "am agree", "agreeing", "agreed"], answer: 0 },
-            { q: "We talked _____ our plans for the weekend.", options: ["for", "about", "with", "to"], answer: 1 },
-            { q: "She _____ TV when he arrived.", options: ["was watching", "watched", "watches", "is watching"], answer: 0 },
-            { q: "I have _____ finished my homework.", options: ["just", "yet", "ever", "never"], answer: 0 },
-            { q: "You _____ smoke in the hospital.", options: ["mustn't", "don't have to", "needn't", "aren't"], answer: 0 }
-        ],
-        [ // Level 2: B1 (inkl. 3 Hörverstehens-Fragen im beruflichen/allgemeinen Kontext)
-            { q: "LISTEN TO THE WORKPLACE VOICEMAIL:\n\nQuestion: Why is Mark calling Sarah?", audioText: "Hi Sarah, this is Mark from accounting. There is a small error on invoice 402. Could you please check the tax amount and send me the revised document by noon?", options: ["To invite her to lunch", "To ask her to correct an error on an invoice", "To cancel tomorrow's meeting", "To complain about a computer bug"], answer: 1 },
-            { q: "LISTEN TO THE AIRPORT ANNOUNCEMENT:\n\nQuestion: Where is Flight BA-405 boarding?", audioText: "Flight BA-405 to London is now boarding at Gate 14. Passengers are reminded to have their boarding passes and passports ready for inspection.", options: ["At Gate 40", "At Gate 4", "At Gate 14", "At Gate 50"], answer: 2 },
-            { q: "LISTEN TO THE TEAM UPDATE:\n\nQuestion: Why was the strategy meeting postponed?", audioText: "Good morning everyone. Since the project manager is sick today, our strategy meeting is postponed until Friday at 2 PM. We will use today's slot for individual work.", options: ["The meeting room was double-booked", "The project manager is sick", "The internet connection failed", "The client cancelled the project"], answer: 1 },
-            { q: "If it rains tomorrow, we _____ stay at home.", options: ["will", "would", "did", "stay"], answer: 0 },
-            { q: "I am looking forward _____ you soon.", options: ["to see", "see", "to seeing", "seeing"], answer: 2 },
-            { q: "She _____ in this town for ten years.", options: ["live", "lives", "is living", "has lived"], answer: 3 },
-            { q: "Could you tell me where _____?", options: ["is the station", "the station is", "is station", "station is"], answer: 1 },
-            { q: "I was very _____ when I heard the good news.", options: ["excited", "exciting", "excite", "excites"], answer: 0 },
-            { q: "Have you ever _____ to Australia?", options: ["be", "went", "been", "going"], answer: 2 },
-            { q: "The window _____ broken by the children.", options: ["are", "were", "was", "have been"], answer: 2 },
-            { q: "You _____ wear a uniform at our school.", options: ["mustn't", "don't have to", "shouldn't", "haven't to"], answer: 1 },
-            { q: "She is afraid _____ spiders.", options: ["of", "about", "for", "with"], answer: 0 },
-            { q: "I suggest _____ an umbrella, it looks like rain.", options: ["taking", "to take", "take", "took"], answer: 0 },
-            { q: "He has lived here _____ he was a child.", options: ["since", "for", "during", "in"], answer: 0 },
-            { q: "They would travel more if they _____ more money.", options: ["have", "had", "will have", "would have"], answer: 1 },
-            { q: "Are you interested _____ joining our club?", options: ["to", "in", "of", "for"], answer: 1 },
-            { q: "The music was _____ loud that I couldn't sleep.", options: ["too", "very", "so", "much"], answer: 2 },
-            { q: "We need to deal _____ this problem quickly.", options: ["to", "with", "about", "for"], answer: 1 },
-            { q: "If I have time, I _____ you.", options: ["will help", "would help", "helped", "help"], answer: 0 },
-            { q: "The house _____ built in 1920.", options: ["was", "is", "has", "were"], answer: 0 },
-            { q: "He asked me if I _____ English.", options: ["spoke", "speak", "speaking", "spoken"], answer: 0 },
-            { q: "She is very good _____ playing tennis.", options: ["at", "in", "on", "with"], answer: 0 }
-        ],
-        [ // Level 3: B2 (inkl. 3 Hörverstehens-Fragen im Geschäfts-/Sachtext-Kontext)
-            { q: "LISTEN TO THE BUSINESS NEGOTIATION:\n\nQuestion: Under what condition will the speaker accept the deal?", audioText: "While we appreciate your offer of a five percent discount, our budget constraints mean we can only proceed if the delivery costs are included in the overall price.", options: ["If a 10% discount is offered", "If delivery costs are included in the total price", "If delivery is completed within two weeks", "If payment is deferred by a year"], answer: 1 },
-            { q: "LISTEN TO THE TECH NEWS REPORT:\n\nQuestion: What is the main criticism of the new smartwatch?", audioText: "Despite initial excitement around the new smartwatch, consumer reviews have been lukewarm due to disappointing battery life and software bugs during setup.", options: ["It is too expensive", "Poor battery life and software bugs", "The screen is too small", "It is not waterproof"], answer: 1 },
-            { q: "LISTEN TO THE HR POLICY UPDATE:\n\nQuestion: What rule applies to the hybrid working model?", audioText: "Starting next month, our hybrid working model allows employees to work from home three days a week, provided that core team hours between ten and two are respected.", options: ["Employees can never work from home on Mondays", "Employees must be available during core hours from 10 to 2", "All meetings must take place online", "Working from home requires a doctor's note"], answer: 1 },
-            { q: "By the time we arrived, the film _____.", options: ["started", "has started", "had started", "was starting"], answer: 2 },
-            { q: "The car _____ repaired at the moment.", options: ["is repairing", "is being repaired", "repairs", "has repaired"], answer: 1 },
-            { q: "Unless you _____, you will miss the beginning.", options: ["hurry up", "don't hurry up", "will hurry up", "hurried up"], answer: 0 },
-            { q: "I strongly advise _____ a lawyer.", options: ["to consult", "consult", "consulting", "consulted"], answer: 2 },
-            { q: "The man _____ car was stolen called the police.", options: ["who's", "whose", "which", "that"], answer: 1 },
-            { q: "By next year, I _____ my studies.", options: ["will finish", "finish", "am finishing", "will have finished"], answer: 3 },
-            { q: "You had better _____ a doctor immediately.", options: ["to see", "seeing", "see", "saw"], answer: 2 },
-            { q: "We are used to _____ early in the morning.", options: ["get up", "getting up", "got up", "be getting up"], answer: 1 },
-            { q: "Despite _____ hard, he failed the exam.", options: ["study", "to study", "studying", "studied"], answer: 2 },
-            { q: "The match was called _____ because of heavy rain.", options: ["off", "out", "away", "down"], answer: 0 },
-            { q: "No sooner had we sat down _____ the phone rang.", options: ["than", "when", "then", "that"], answer: 0 },
-            { q: "I remember _____ Paris when I was a child.", options: ["visit", "to visit", "visiting", "visited"], answer: 2 },
-            { q: "If I _____ about the traffic, I would have taken another route.", options: ["knew", "had known", "would know", "have known"], answer: 1 },
-            { q: "We need to figure _____ how to solve this issue.", options: ["out", "up", "in", "off"], answer: 0 },
-            { q: "The weather had a major impact _____ our holiday plans.", options: ["to", "in", "on", "for"], answer: 2 },
-            { q: "She spoke so fast that I could _____ understand her.", options: ["hardly", "hard", "almost", "nearly"], answer: 0 },
-            { q: "I wish I _____ more free time.", options: ["had", "have", "will have", "having"], answer: 0 },
-            { q: "She accused him _____ stealing the money.", options: ["of", "for", "with", "about"], answer: 0 },
-            { q: "We had our house _____ last year.", options: ["painted", "paint", "painting", "to paint"], answer: 0 },
-            { q: "It's no use _____ about it now.", options: ["complaining", "complain", "to complain", "complained"], answer: 0 }
-        ],
-        [ // Level 4: C1 (inkl. 3 anspruchsvollen Hörverstehens-Fragen)
-            { q: "LISTEN TO THE ECONOMICS LECTURE:\n\nQuestion: What is the speaker's assessment of immediate interest rate cuts?", audioText: "Many analysts argue that immediate interest rate cuts will stimulate growth; however, they tend to overlook the lingering inflationary pressures in the services sector, which could render such cuts premature.", options: ["They are guaranteed to stop inflation immediately", "They might be premature due to ongoing inflation in services", "They are universally supported by all central banks", "They will harm the manufacturing sector exclusively"], answer: 1 },
-            { q: "LISTEN TO THE CORPORATE RESTRUCTURING ANNOUNCEMENT:\n\nQuestion: How is the company addressing its challenges?", audioText: "Rather than implementing across-the-board redundancies, management has decided to freeze hiring and consolidate underperforming regional divisions to preserve core personnel.", options: ["By firing 50% of the workforce immediately", "By freezing hiring and merging regional divisions instead of mass layoffs", "By relocating the headquarters to another continent", "By lowering salaries across all departments"], answer: 1 },
-            { q: "LISTEN TO THE MEDIA CRITIQUE:\n\nQuestion: Why does the speaker criticize the documentary?", audioText: "The documentary purports to offer an objective overview of the energy crisis, yet its selective reliance on industry-funded studies inevitably skews the narrative toward short-term fossil fuel subsidies.", options: ["It is too long and technical for the general public", "It is biased because it relies heavily on industry-funded studies", "It ignores the economic benefits of fossil fuels entirely", "The interviews were poorly translated"], answer: 1 },
-            { q: "Not only _____ the exam, but she also got the highest score.", options: ["she passed", "did she pass", "passed she", "she did pass"], answer: 1 },
-            { q: "It is vital that the truth _____ revealed.", options: ["is", "be", "will be", "was"], answer: 1 },
-            { q: "Had I known about the danger, I _____ there.", options: ["would not go", "will not go", "did not go", "would not have gone"], answer: 3 },
-            { q: "The painting _____ to be a masterpiece.", options: ["is considered", "considered", "is considering", "considers"], answer: 0 },
-            { q: "We must _____ the underlying causes of the conflict.", options: ["look up", "look into", "look over", "look after"], answer: 1 },
-            { q: "Should you _____ any questions, feel free to ask.", options: ["need", "requiring", "have", "required"], answer: 2 },
-            { q: "I'd rather you _____ smoke in this room.", options: ["don't", "didn't", "won't", "not"], answer: 1 },
-            { q: "It’s high time we _____ our lifestyle.", options: ["change", "changing", "changed", "have changed"], answer: 2 },
-            { q: "She takes _____ her mother in both looks and temperament.", options: ["after", "over", "up", "on"], answer: 0 },
-            { q: "He objected _____ treated like a child.", options: ["to being", "to be", "against being", "for being"], answer: 0 },
-            { q: "Rarely _____ such dedication in a young athlete.", options: ["we have seen", "have we seen", "we saw", "we see"], answer: 1 },
-            { q: "She insisted on _____ informed about every detail.", options: ["being", "be", "to be", "been"], answer: 0 },
-            { q: "We are on the _____ of a major breakthrough.", options: ["corner", "verge", "surface", "border"], answer: 1 },
-            { q: "His careless actions put his entire career in _____.", options: ["jeopardy", "caution", "warning", "alarm"], answer: 0 },
-            { q: "Please refrain _____ talking during the performance.", options: ["to", "from", "of", "about"], answer: 1 },
-            { q: "We need to _____ out all the misunderstandings.", options: ["iron", "flatten", "press", "fold"], answer: 0 },
-            { q: "Under no circumstances _____ this door be opened.", options: ["should", "it should", "should it", "ought"], answer: 0 },
-            { q: "She succeeded in _____ the project on time.", options: ["completing", "complete", "completed", "to complete"], answer: 0 },
-            { q: "The company is bound _____ bankrupt.", options: ["to go", "going", "go", "gone"], answer: 0 },
-            { q: "He was on the verge _____ tears.", options: ["of", "to", "with", "in"], answer: 0 }
-        ],
-        [ // Level 5: C2 (inkl. 3 hochanspruchsvollen Hörverstehens-Fragen)
-            { q: "LISTEN TO THE ACADEMIC DISCOURSE:\n\nQuestion: How does the speaker characterize the critique of utilitarian ethics?", audioText: "The speaker's polemic against utilitarian ethics is less an innovative theoretical paradigm than a rhetorical sleight of hand, concealing normative assumptions behind a veneer of pragmatic realism.", options: ["As an innovative and groundbreaking ethical paradigm", "As deceptive rhetoric concealing underlying assumptions", "As a straightforward and pragmatic defense of realism", "As a mathematically rigorous refutation of ethics"], answer: 1 },
-            { q: "LISTEN TO THE GEOPOLITICAL ANALYSIS:\n\nQuestion: What primarily drove the improvement in relations according to the speaker?", audioText: "To attribute the bilateral détente solely to diplomatic statecraft is to ignore the compelling fiscal imperatives that forced both adversaries to curtail their proxy expenditures.", options: ["Brilliant diplomatic statecraft by ambassadors", "Financial pressures that forced both sides to reduce spending", "A sudden cultural shift in public opinion", "The signing of a global environmental treaty"], answer: 1 },
-            { q: "LISTEN TO THE LITERARY COMMENTARY:\n\nQuestion: What is the deeper function of the play according to the commentary?", audioText: "Far from being a straightforward satire of corporate greed, the play operates as an unsettling allegory where the protagonists' moral compromises mirror the audience's own complicity in systemic exploitation.", options: ["It provides lighthearted comedy about corporate executives", "It exposes the audience's own involvement in systemic exploitation", "It defends historical corporate monopolies", "It argues that moral compromises are necessary for success"], answer: 1 },
-            { q: "Scarcely _____ the house when it started to pour.", options: ["had we left", "we had left", "we left", "did we leave"], answer: 0 },
-            { q: "Despite the tragic news, he managed to keep a stiff upper _____ throughout the ordeal.", options: ["mouth", "lip", "chin", "face"], answer: 1 },
-            { q: "Our success hinges _____ teamwork and dedication.", options: ["on", "in", "about", "with"], answer: 0 },
-            { q: "Due to the absence of the boss, she took it upon _____ to lead.", options: ["him", "himself", "herself", "she"], answer: 2 },
-            { q: "Try as she _____, she couldn't open the jammed door.", options: ["should", "could", "would", "might"], answer: 3 },
-            { q: "The mission was doomed _____ failure from its inception.", options: ["to", "for", "at", "with"], answer: 0 },
-            { q: "Her translation was absolutely _____; not a single error was found.", options: ["flawless", "harmless", "blameless", "careless"], answer: 0 },
-            { q: "He took _____ at the remark about his appearance.", options: ["pity", "umbrage", "notice", "insult"], answer: 1 },
-            { q: "The new regulations will inevitably _____ a heavy toll on small shops.", options: ["take", "make", "have", "do"], answer: 0 },
-            { q: "She has a natural knack _____ picking up languages.", options: ["for", "of", "in", "to"], answer: 0 },
-            { q: "After hours of talks, the negotiations ground to a _____.", options: ["halt", "stop", "end", "close"], answer: 0 },
-            { q: "Ensure your work complies _____ all safety standards.", options: ["with", "to", "by", "in"], answer: 0 },
-            { q: "Their savings were slowly whittled _____ by rising costs.", options: ["away", "off", "out", "over"], answer: 0 },
-            { q: "He loves playing devil's _____ during discussions.", options: ["advocate", "lawyer", "representative", "proxy"], answer: 0 },
-            { q: "His behavior was completely _____, leaving everyone in shock.", options: ["reprehensible", "respectful", "receptive", "reluctant"], answer: 0 },
-            { q: "That objection is entirely beside the _____.", options: ["point", "matter", "issue", "subject"], answer: 0 },
-            { q: "The politician managed to skirt _____ the issue.", options: ["around", "over", "through", "off"], answer: 0 },
-            { q: "His comments were completely _____ the mark.", options: ["off", "out", "beyond", "below"], answer: 0 },
-            { q: "She bears a _____ resemblance to her grandmother.", options: ["striking", "hitting", "punching", "smacking"], answer: 0 },
-            { q: "He is prone _____ exaggeration when telling stories.", options: ["to", "for", "of", "with"], answer: 0 }
-        ]
-    ];
-
-    const levelNames = ["A1", "A2", "B1", "B2", "C1", "C2"];
     const levelDescriptions = [
-        "Grundlegende Kenntnisse. Fokus auf Basiswortschatz, einfache Alltagstexte und einfache Satzstrukturen.",
-        "Sichere Grundkenntnisse. Verständigung in vertrauten Situationen sowie Verstehen kurzer Alltags- und Hinweistexte.",
-        "Gute Mittelstufe. Bewältigung allgemeiner Kommunikationssituationen und Erfassen von Hauptaussagen in Sachtexten.",
-        "Gehobenes Sprachniveau. Fließender Ausdruck und Verständnis komplexerer Argumentationsstrukturen und Artikel.",
-        "Verhandlungssicheres Niveau. Hohe Sprachkompetenz im akademischen Kontext sowie tiefes Verständnis anspruchsvoller Fachtexte.",
-        "Annähernd muttersprachliches Niveau. Müheloses Erfassen nuancierter, rhetorisch komplexer und stilistisch ausgereifter Texte."
+        "Grundlegende Strukturen und Wörter (z. B. to be, einfache Fragen, Präsens, Zeitangaben) werden überwiegend erkannt. Für den Unterricht passt Material mit kurzen, einfachen Sätzen und viel Unterstützung.",
+        "Häufige Alltagsstrukturen (z. B. einfache Vergangenheit, Steigerung, Verlaufsform) werden überwiegend sicher erkannt. Für den Unterricht passen kurze, klar aufgebaute Texte mit Wortschatzhilfen.",
+        "Zentrale Strukturen der Mittelstufe (z. B. Present Perfect, Bedingungssätze, Passiv, indirekte Fragen) werden überwiegend sicher erkannt. Für den Unterricht passt alltagsnahes und berufsbezogenes Material mit gelegentlichen Hilfen.",
+        "Auch anspruchsvollere Strukturen (z. B. Past Perfect, Future Perfect, Gerundium und Infinitiv, Phrasal Verbs) werden überwiegend sicher erkannt. Für den Unterricht passt authentisches Material mit vertiefenden Zusatzaufgaben.",
+        "Auch seltenere und gehobene Strukturen (z. B. Inversion, Konjunktiv, feste Wendungen) werden überwiegend sicher erkannt. Anspruchsvolle Erweiterungsaufgaben sind sinnvoll.",
+        "Auch seltene idiomatische Wendungen und sehr gehobene Strukturen werden überwiegend sicher erkannt. Oberhalb dieser Stufe kann der Test nicht weiter unterscheiden."
     ];
 
     function startTest() {
         const name = document.getElementById("student-name").value.trim();
         const schoolClass = document.getElementById("student-class").value.trim();
-        const year = document.getElementById("student-year").value.trim();
 
-        if (!name || !schoolClass || !year) {
-            alert("Bitte fülle alle Felder aus (Name, Klasse, Schuljahr).");
+        if (!name || !schoolClass) {
+            alert("Bitte fülle alle Felder aus (Name und Klasse).");
             return;
         }
 
         studentData.name = name;
         studentData.schoolClass = schoolClass;
-        studentData.year = year;
+        // C-29: Schuljahr wird nicht mehr abgefragt (wurde nie übermittelt),
+        // sondern aus dem Datum abgeleitet; Wechsel am 1. August
+        const heute = new Date();
+        const startjahr = heute.getMonth() >= 7 ? heute.getFullYear() : heute.getFullYear() - 1;
+        studentData.year = `${startjahr}/${startjahr + 1}`;
 
         document.getElementById("student-form").style.display = "none";
-        document.getElementById("quiz").style.display = "block";
+        zeigeBeispiel();
+    }
 
+    // Beispielaufgabe (C-37): zeigt Ablauf und "Ich weiß es nicht", zählt nicht
+    function zeigeBeispiel() {
+        const bereich = document.getElementById("beispiel");
+        const rueckmeldung = document.getElementById("beispiel-rueckmeldung");
+        const weiterBtn = document.getElementById("beispiel-weiter");
+        bereich.style.display = "block";
+
+        bereich.querySelectorAll('input[name="beispiel"]').forEach(input => {
+            input.addEventListener("change", () => {
+                bereich.querySelectorAll(".option-btn").forEach(l => l.classList.remove("ausgewaehlt"));
+                input.parentElement.classList.add("ausgewaehlt");
+                weiterBtn.disabled = false;
+                if (input.value === "richtig") {
+                    rueckmeldung.textContent = "Richtig. So geht es: Antwort wählen, dann auf „Weiter“ klicken. Im Test siehst du nicht, ob deine Antwort richtig ist.";
+                } else if (input.value === WEISS_NICHT) {
+                    rueckmeldung.textContent = "So kannst du es machen, wenn du gar keine Idee hast. Richtig wäre hier „is“. Im Test siehst du nicht, ob deine Antwort richtig ist.";
+                } else {
+                    rueckmeldung.textContent = "Richtig wäre hier „is“. Im Test siehst du nicht, ob deine Antwort richtig ist.";
+                }
+            });
+        });
+
+        weiterBtn.onclick = () => {
+            bereich.style.display = "none";
+            if (hoerteilAktiv) {
+                zeigeTontest();
+            } else {
+                beginneTest();
+            }
+        };
+        document.querySelector("#beispiel h2").setAttribute("tabindex", "-1");
+        document.querySelector("#beispiel h2").focus();
+    }
+
+    // Tontest (C-26): Kopfhörer, Lautstärke und englische Stimme vorab prüfen
+    function zeigeTontest() {
+        const bereich = document.getElementById("tontest");
+        const text = document.getElementById("tontest-text");
+        const hinweis = document.getElementById("tontest-hinweis");
+        const playBtn = document.getElementById("tontest-play");
+        const okBtn = document.getElementById("tontest-ok");
+        const problemBtn = document.getElementById("tontest-problem");
+        const problemBox = document.getElementById("tontest-problem-box");
+        const textStartBtn = document.getElementById("tontest-text-start");
+
+        bereich.style.display = "block";
+
+        if (!sprachausgabeVerfuegbar) {
+            text.textContent = "Dieser Browser unterstützt keine Sprachausgabe. Die Hörtexte werden deshalb als Text angezeigt. Bitte sag deiner Lehrkraft Bescheid.";
+            playBtn.style.display = "none";
+            okBtn.style.display = "none";
+            problemBtn.style.display = "none";
+            problemBox.style.display = "block";
+            problemBox.querySelectorAll("p").forEach(p => { p.style.display = "none"; });
+            textStartBtn.textContent = "Test starten";
+        }
+
+        playBtn.onclick = () => {
+            playListeningAudio("This is a sound check. If you can hear this sentence clearly, you are ready to start.");
+            const stimmen = window.speechSynthesis.getVoices();
+            if (stimmen.length > 0 && !stimmen.some(v => v.lang && v.lang.toLowerCase().startsWith("en"))) {
+                keineEnglischeStimme = true;
+                hinweis.classList.add("warnung");
+                hinweis.textContent = "Auf diesem Gerät wurde keine englische Stimme gefunden. Die Aussprache kann fehlerhaft sein. Bitte sag deiner Lehrkraft Bescheid.";
+            } else {
+                hinweis.classList.remove("warnung");
+                hinweis.textContent = "Hörst du den Satz deutlich? Dann starte den Test. Wenn nicht, klicke auf „Ich höre nichts oder nur schlecht“.";
+            }
+            okBtn.focus();
+        };
+        okBtn.onclick = () => {
+            textStattTon = false;
+            beginneTest();
+        };
+        problemBtn.onclick = () => {
+            problemBox.style.display = "block";
+            textStartBtn.focus();
+        };
+        textStartBtn.onclick = () => {
+            textStattTon = true;
+            beginneTest();
+        };
+        playBtn.style.display !== "none" ? playBtn.focus() : textStartBtn.focus();
+    }
+
+    function beginneTest() {
+        stoppeSprachausgabe();
+        document.getElementById("tontest").style.display = "none";
+        document.getElementById("quiz").style.display = "block";
         testLaeuft = true;
+        startZeit = Date.now();
+        startUhrzeit = new Date(startZeit).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+        try {
+            versuchAufGeraet = (parseInt(localStorage.getItem("englischtest-versuche") || "0", 10) || 0) + 1;
+            localStorage.setItem("englischtest-versuche", String(versuchAufGeraet));
+        } catch (e) {
+            versuchAufGeraet = 0; // Speicher nicht verfügbar (z. B. privater Modus): unbekannt
+        }
         loadNextQuestion();
     }
 
-    // Warnt beim versehentlichen Neuladen oder Schließen, solange der Test läuft.
-    // Ohne diese Sperre ging ein angefangener Testlauf kommentarlos verloren.
+    // Warnt beim versehentlichen Neuladen oder Schließen, solange der Test läuft
+    // oder das Ergebnis noch nicht an die Lehrkraft geschickt wurde.
     window.addEventListener("beforeunload", (e) => {
-        if (!testLaeuft) return;
+        if (!testLaeuft && !(ergebnisBereit && !uebermittlungGeoeffnet)) return;
         e.preventDefault();
         e.returnValue = "";
     });
@@ -419,33 +877,49 @@
         window.speechSynthesis.speak(utterance);
     }
 
+    function aktualisiereAudioAnzeige() {
+        const playBtn = document.getElementById("play-audio-btn");
+        const label = document.getElementById("play-audio-label");
+        const audioHinweis = document.getElementById("audio-hinweis");
+        const rest = MAX_WIEDERGABEN - wiedergaben;
+        if (rest <= 0) {
+            playBtn.disabled = true;
+            label.textContent = "Hörtext wurde " + MAX_WIEDERGABEN + "-mal abgespielt";
+            audioHinweis.textContent = "Beantworte die Frage jetzt.";
+        } else {
+            playBtn.disabled = false;
+            label.textContent = wiedergaben === 0 ? "Hörtext abspielen" : "Hörtext noch einmal abspielen";
+            audioHinweis.textContent = "Du kannst den Hörtext höchstens " + MAX_WIEDERGABEN + "-mal abspielen (noch " + rest + "-mal).";
+        }
+    }
+
     function loadNextQuestion() {
         if (questionsAsked >= maxQuestions) {
             showResult();
             return;
         }
 
-        // Auswahl über Indizes statt über Objektidentität (indexOf lieferte bei
-        // inhaltsgleichen Fragen den falschen Index und markierte die falsche Frage)
-        let verfuegbareIndizes = questionBank[currentLevel]
-            .map((_, index) => index)
-            .filter(index => !usedQuestions.has(`${currentLevel}-${index}`));
+        const istHoeraufgabe = HOER_POSITIONEN.includes(questionsAsked);
+        const auswahl = waehleAufgabe(currentLevel, istHoeraufgabe, usedQuestions, benutzteKonstrukte);
+        currentQuestionData = auswahl.frage;
+        currentQuestionLevel = auswahl.stufe;
+        usedQuestions.add(currentQuestionData.id);
+        benutzteKonstrukte.add(currentQuestionData.konstrukt);
+        wiedergaben = 0;
 
-        if (verfuegbareIndizes.length === 0) {
-            // Pool dieses Levels erschöpft: nur dieses Level zurücksetzen,
-            // damit bereits gestellte Fragen anderer Level gesperrt bleiben
-            questionBank[currentLevel].forEach((_, index) => usedQuestions.delete(`${currentLevel}-${index}`));
-            verfuegbareIndizes = questionBank[currentLevel].map((_, index) => index);
+        document.getElementById("progress").textContent = `Frage ${questionsAsked + 1} von ${maxQuestions}`;
+        // Kurzer deutscher Arbeitsauftrag je Aufgabentyp (C-37)
+        let auftrag = "Wähle die passende Lösung für die Lücke.";
+        if (currentQuestionData.bereich === "H") {
+            auftrag = textStattTon
+                ? "Lies den Hörtext und beantworte die Frage."
+                : "Hör dir den Text an und beantworte die Frage.";
+        } else if (currentQuestionData.bereich === "L") {
+            auftrag = "Lies den Text und beantworte die Frage.";
         }
+        document.getElementById("arbeitsauftrag").textContent = auftrag;
+        document.getElementById("question-text").textContent = currentQuestionData.q;
 
-        const gewaehlterIndex = verfuegbareIndizes[Math.floor(Math.random() * verfuegbareIndizes.length)];
-        currentQuestionData = questionBank[currentLevel][gewaehlterIndex];
-        usedQuestions.add(`${currentLevel}-${gewaehlterIndex}`);
-        antwortGesperrt = false;
-
-        document.getElementById("progress").innerText = `Frage ${questionsAsked + 1} von ${maxQuestions}`;
-        document.getElementById("question-text").innerText = currentQuestionData.q;
-        
         // Prüfen, ob die Frage eine Hörverstehens-Aufgabe ist
         const audioContainer = document.getElementById("audio-container");
         const playBtn = document.getElementById("play-audio-btn");
@@ -454,48 +928,116 @@
 
         if (currentQuestionData.audioText) {
             audioContainer.style.display = "block";
-            if (sprachausgabeVerfuegbar) {
+            if (!textStattTon) {
                 playBtn.style.display = "inline-block";
-                audioHinweis.innerText = "Klicke auf den Button, um die englische Sprachausgabe zu hören.";
-                playBtn.onclick = () => playListeningAudio(currentQuestionData.audioText);
+                aktualisiereAudioAnzeige();
+                playBtn.onclick = () => {
+                    if (wiedergaben >= MAX_WIEDERGABEN) return;
+                    wiedergaben++;
+                    playListeningAudio(currentQuestionData.audioText);
+                    aktualisiereAudioAnzeige();
+                };
             } else {
-                // Ohne Web Speech API wäre die Aufgabe nicht lösbar: Text einblenden
+                // Ohne Ton wäre die Aufgabe nicht lösbar: Text einblenden (wird vermerkt)
                 playBtn.style.display = "none";
                 playBtn.onclick = null;
-                audioHinweis.innerText =
-                    "Dieser Browser unterstützt keine Sprachausgabe. Lies den Hörtext stattdessen:\n\n„" +
-                    currentQuestionData.audioText + "“";
+                audioHinweis.textContent = "Lies den Hörtext:\n\n";
+                const transkript = document.createElement("span");
+                transkript.lang = "en";
+                transkript.textContent = "„" + currentQuestionData.audioText + "“";
+                audioHinweis.appendChild(transkript);
             }
         } else {
             audioContainer.style.display = "none";
         }
-        
+
+        // Antwortoptionen als Radiobuttons in zufälliger Reihenfolge (C-03, C-04, C-36)
         const optionsDiv = document.getElementById("options");
         optionsDiv.innerHTML = "";
-        
-        currentQuestionData.options.forEach((option, index) => {
-            const btn = document.createElement("button");
-            btn.className = "option-btn";
-            btn.innerText = option;
-            btn.onclick = () => handleAnswer(index);
-            optionsDiv.appendChild(btn);
+        const legende = document.createElement("legend");
+        legende.className = "sr-only";
+        legende.textContent = "Antwortmöglichkeiten";
+        optionsDiv.appendChild(legende);
+
+        const weiterBtn = document.getElementById("weiter-btn");
+        weiterBtn.disabled = true;
+
+        // Gemischte Optionen, danach immer an letzter Stelle "Ich weiß es nicht" (C-10)
+        const reihenfolge = mische(currentQuestionData.options.map((_, index) => index));
+        reihenfolge.push(WEISS_NICHT);
+        reihenfolge.forEach(index => {
+            const istWeissNicht = index === WEISS_NICHT;
+            const label = document.createElement("label");
+            label.className = istWeissNicht ? "option-btn option-weissnicht" : "option-btn";
+            label.lang = istWeissNicht ? "de" : "en";
+            const input = document.createElement("input");
+            input.type = "radio";
+            input.name = "antwort";
+            input.value = String(index);
+            input.addEventListener("change", () => {
+                optionsDiv.querySelectorAll(".option-btn").forEach(l => l.classList.remove("ausgewaehlt"));
+                label.classList.add("ausgewaehlt");
+                weiterBtn.disabled = false;
+            });
+            // Enter auf einer gewählten Antwort entspricht "Weiter"
+            input.addEventListener("keydown", (e) => {
+                if (e.key === "Enter" && input.checked) {
+                    e.preventDefault();
+                    handleAnswer();
+                }
+            });
+            const text = document.createElement("span");
+            text.textContent = istWeissNicht ? "Ich weiß es nicht" : currentQuestionData.options[index];
+            label.appendChild(input);
+            label.appendChild(text);
+            optionsDiv.appendChild(label);
         });
+
+        // Kurze Eingabesperre nach dem Aufgabenwechsel (C-04): Ein zweiter Klick
+        // eines Doppelklicks könnte sonst auf einer Option der neuen Aufgabe landen
+        // (das Layout verschiebt sich z. B. bei Höraufgaben).
+        optionsDiv.disabled = true;
+        clearTimeout(eingabeSperreTimer);
+        eingabeSperreTimer = setTimeout(() => { optionsDiv.disabled = false; }, EINGABESPERRE_MS);
+
+        antwortGesperrt = false;
+        // Fokus auf die neue Frage, damit Screenreader sie ansagen (C-36)
+        document.getElementById("frage-kopf").focus();
     }
 
-    function handleAnswer(selectedIndex) {
-        if (antwortGesperrt) return; // schützt vor doppelter Wertung bei schnellem Doppelklick
-        antwortGesperrt = true;
+    function handleAnswer() {
+        if (antwortGesperrt) return;
+        const gewaehlt = document.querySelector('#options input[name="antwort"]:checked');
+        if (!gewaehlt) return; // "Weiter" ohne Auswahl wird ignoriert
+        antwortGesperrt = true; // bis die nächste Aufgabe aufgebaut ist
+        document.getElementById("weiter-btn").disabled = true;
 
-        if (selectedIndex === currentQuestionData.answer) {
-            const pointsForLevel = (currentLevel + 1) * 2;
-            totalScore += pointsForLevel;
+        const weissNicht = gewaehlt.value === WEISS_NICHT;
+        const richtig = !weissNicht && Number(gewaehlt.value) === currentQuestionData.answer;
+        const istHoeraufgabe = Boolean(currentQuestionData.audioText);
 
-            if (currentLevel < 5) currentLevel++;
-        } else {
-            if (currentLevel > 0) currentLevel--;
+        if (richtig) {
+            totalScore += (currentQuestionLevel + 1) * 2;
         }
-        
+
+        protokoll.push({
+            id: currentQuestionData.id,
+            konstrukt: currentQuestionData.konstrukt,
+            stufe: currentQuestionLevel,
+            bereich: currentQuestionData.bereich,
+            richtig: richtig,
+            weissNicht: weissNicht,
+            wiedergaben: wiedergaben,
+            alsText: istHoeraufgabe && textStattTon
+        });
+
+        // Höraufgaben verändern die adaptive Stufe nicht; sie werden getrennt ausgewiesen
+        if (!istHoeraufgabe) {
+            currentLevel = naechsteStufe(currentLevel, richtig);
+        }
+
         questionsAsked++;
+        stoppeSprachausgabe();
         loadNextQuestion();
     }
 
@@ -509,8 +1051,20 @@
     // Kein kryptografischer Schutz - der Code liegt im Browser offen.
     const GEHEIMZAHL = 4829;
 
+    // C-28: JavaScript macht beim Großschreiben aus "ß" ein "SS" ("Weiß" -> "WEISS").
+    // Excels GROSS()/UPPER() lässt "ß" vermutlich unverändert. Bitte mit der
+    // Testansicht (...index.html?pruefcode) gegen eine Excel-Zeile prüfen:
+    // Stimmen Namen mit "ß" nicht überein, hier auf true stellen.
+    // Standard false = bisheriges Verhalten (keine Änderung bestehender Prüfcodes).
+    const ESZETT_BEIBEHALTEN = false;
+
+    function grossschreibung(text) {
+        if (!ESZETT_BEIBEHALTEN) return text.toUpperCase();
+        return text.split("ß").map(teil => teil.toUpperCase()).join("ß");
+    }
+
     function berechnePruefcode(name, klasse, datum, punkte, niveau) {
-        const basis = [name.trim().toUpperCase(), klasse.trim().toUpperCase(), datum, punkte, niveau].join("|");
+        const basis = [grossschreibung(name.trim()), grossschreibung(klasse.trim()), datum, punkte, niveau].join("|");
         let summe = GEHEIMZAHL;
         for (let i = 0; i < basis.length; i++) {
             summe = (summe * 31 + basis.charCodeAt(i)) % 999983;
@@ -518,46 +1072,166 @@
         return summe;
     }
 
+    // Zählt richtige/bearbeitete Aufgaben je Bereich und Stufe
+    function auswertungNachBereich(bereiche) {
+        const eintraege = protokoll.filter(p => bereiche.includes(p.bereich));
+        const jeStufe = leereStatistik();
+        eintraege.forEach(p => {
+            jeStufe[p.stufe].n++;
+            if (p.richtig) jeStufe[p.stufe].r++;
+        });
+        const stufenText = jeStufe
+            .map((s, i) => s.n > 0 ? `${levelNames[i]} ${s.r}/${s.n}` : null)
+            .filter(Boolean)
+            .join(", ");
+        return {
+            n: eintraege.length,
+            r: eintraege.filter(p => p.richtig).length,
+            stufenText: stufenText
+        };
+    }
+
     function showResult() {
         stoppeSprachausgabe(); // Stoppt Sprachausgabe am Testende
-        testLaeuft = false;    // ab hier keine Warnung mehr (Weiterleitung zu Forms folgt)
+        testLaeuft = false;
+        ergebnisBereit = true;
         document.getElementById("quiz").style.display = "none";
         document.getElementById("result").style.display = "block";
-        
-        document.getElementById("student-info-summary").innerHTML = `
-            <strong>Name:</strong> ${studentData.name}<br>
-            <strong>Klasse:</strong> ${studentData.schoolClass}<br>
-            <strong>Schuljahr:</strong> ${studentData.year}
-        `;
 
-        let finalLevelIndex = 0;
-        if (totalScore >= 185) {
-            finalLevelIndex = 5; // C2
-        } else if (totalScore >= 135) {
-            finalLevelIndex = 4; // C1
-        } else if (totalScore >= 95) {
-            finalLevelIndex = 3; // B2
-        } else if (totalScore >= 60) {
-            finalLevelIndex = 2; // B1
-        } else if (totalScore >= 35) {
-            finalLevelIndex = 1; // A2
+        // C-33: Eingaben als Text einsetzen, nicht als HTML
+        const zusammenfassung = document.getElementById("student-info-summary");
+        zusammenfassung.innerHTML = "";
+        [["Name", studentData.name], ["Klasse", studentData.schoolClass], ["Schuljahr", studentData.year]]
+            .forEach(([bezeichnung, wert], i) => {
+                if (i > 0) zusammenfassung.appendChild(document.createElement("br"));
+                const fett = document.createElement("strong");
+                fett.textContent = bezeichnung + ": ";
+                zusammenfassung.appendChild(fett);
+                zusammenfassung.appendChild(document.createTextNode(wert));
+            });
+
+        // Einstufung aus dem adaptiven Teil (ohne Höraufgaben), siehe ermittleNiveau()
+        const niveau = ermittleNiveau(protokoll.filter(p => p.bereich !== "H"));
+        const finalLevelIndex = niveau.stufe;
+        const finalLevelName = levelNames[finalLevelIndex];
+        const finalLevelDesc = niveau.gesichert
+            ? levelDescriptions[finalLevelIndex]
+            : "Auch grundlegende Strukturen wurden im Test noch nicht sicher erkannt. Für den Unterricht passt Material mit sehr einfachen Sätzen, Bildern und viel Unterstützung. In den ersten Stunden genauer beobachten (ggf. auch Testbedingungen prüfen).";
+
+        // Neutrale, nicht stigmatisierende Rückmeldung an die Lernenden (C-38):
+        // keine GER-Stufe, keine Punktzahl. Bei adaptiven Tests liegt die Quote
+        // richtiger Antworten bei fast allen um die Hälfte - das wird erklärt.
+        document.getElementById("danke-text").textContent =
+            `Danke! Du hast alle ${protokoll.length} Aufgaben bearbeitet. ` +
+            "Der Test hat sich an dich angepasst: Nach richtigen Antworten wurden die Aufgaben schwerer, nach falschen leichter. " +
+            "Deshalb ist es ganz normal, dass nicht alles richtig war. " +
+            "Deine Lehrkraft nutzt das Ergebnis, um den Unterricht passend zu planen, und bespricht es mit dir.";
+
+        const bereichText = niveau.untere === niveau.obere
+            ? levelNames[niveau.untere]
+            : `${levelNames[niveau.untere]} bis ${levelNames[niveau.obere]}`;
+        let bandText;
+        if (!niveau.gesichert) {
+            bandText = "Wahrscheinlicher Bereich: A1 – noch nicht sicher";
         } else {
-            finalLevelIndex = 0; // A1
+            bandText = `Wahrscheinlicher Bereich: ${bereichText}`;
         }
 
-        const finalLevelName = levelNames[finalLevelIndex];
-        const finalLevelDesc = levelDescriptions[finalLevelIndex];
+        const anzahlSprachmittel = protokoll.filter(p => p.bereich !== "H").length;
+        document.getElementById("level-badge").textContent = `Orientierungswert: ${finalLevelName}`;
+        document.getElementById("level-band").textContent = bandText;
+        document.getElementById("score-info").textContent =
+            `Bezieht sich auf Grammatik und Wortschatz in ${anzahlSprachmittel} Einzelaufgaben. ` +
+            `Es ist ein Orientierungswert mit einer Unsicherheit von bis zu einer Stufe, kein GER-Zertifikat. ` +
+            `Gewichtete Punkte (nur zur Dokumentation): ${totalScore}`;
+        document.getElementById("level-description").textContent = finalLevelDesc;
 
-        document.getElementById("level-badge").innerText = 
-            `Ergebnis: ${totalScore} / ${maxPossibleScore} Punkte (Niveau ${finalLevelName})`;
-        
-        document.getElementById("level-description").innerText = finalLevelDesc;
+        // Kompetenzprofil (C-05, C-06)
+        const grammatik = auswertungNachBereich(["G"]);
+        const wortschatz = auswertungNachBereich(["W"]);
+        const lesen = auswertungNachBereich(["L"]);
+        const hoeren = auswertungNachBereich(["H"]);
+        const alsTextGelesen = protokoll.some(p => p.alsText);
+
+        const anzahlWeissNicht = protokoll.filter(p => p.weissNicht).length;
+
+        const profilBox = document.getElementById("profil-box");
+        profilBox.innerHTML = "";
+        const neueListe = (ueberschrift) => {
+            const titel = document.createElement("strong");
+            titel.textContent = ueberschrift;
+            profilBox.appendChild(titel);
+            const ul = document.createElement("ul");
+            profilBox.appendChild(ul);
+            return (text) => {
+                const li = document.createElement("li");
+                li.textContent = text;
+                ul.appendChild(li);
+            };
+        };
+        const zeile = neueListe("Profil (richtig gelöst / bearbeitet, je Stufe):");
+        zeile(`Grammatik: ${grammatik.r} von ${grammatik.n}` + (grammatik.n ? ` (${grammatik.stufenText})` : ""));
+        zeile(`Wortschatz und feste Wendungen: ${wortschatz.r} von ${wortschatz.n}` + (wortschatz.n ? ` (${wortschatz.stufenText})` : ""));
+        if (lesen.n > 0) zeile(`Leseaufgabe: ${lesen.r} von ${lesen.n}`);
+        if (hoerteilAktiv) {
+            zeile(`Hörverstehen: ${hoeren.r} von ${hoeren.n} (${hoeren.stufenText})` +
+                (alsTextGelesen ? " – Hörtexte wurden als Text gelesen" : ""));
+        } else {
+            zeile("Hörverstehen: nicht bearbeitet (Test ohne Höraufgaben)");
+        }
+        if (anzahlWeissNicht > 0) zeile(`„Ich weiß es nicht“ gewählt: ${anzahlWeissNicht}-mal`);
+
+        // Gelöste und nicht gelöste Bereiche (C-11): Hinweise für die Förderplanung.
+        // Jeder Eintrag beruht meist auf nur einer Aufgabe - Hinweis, kein Befund.
+        const konstruktListe = (geloest) => {
+            const eintraege = [];
+            protokoll.filter(p => p.bereich !== "H" && p.richtig === geloest).forEach(p => {
+                const text = `${p.konstrukt} (${levelNames[p.stufe]})`;
+                if (!eintraege.includes(text)) eintraege.push(text);
+            });
+            return eintraege;
+        };
+        const geloesteBereiche = konstruktListe(true);
+        const offeneBereiche = konstruktListe(false);
+        const geloestZeile = neueListe("Sicher gelöst:");
+        geloesteBereiche.length ? geloesteBereiche.forEach(geloestZeile) : geloestZeile("–");
+        const offenZeile = neueListe("Nicht gelöst (möglicher Förderbedarf):");
+        offeneBereiche.length ? offeneBereiche.forEach(offenZeile) : offenZeile("–");
+
+        const fussnote = document.createElement("div");
+        fussnote.className = "klein";
+        fussnote.textContent =
+            "Lesen, Schreiben und Sprechen wurden in diesem Test nicht oder kaum erfasst. " +
+            "Die Bereichsangaben beruhen meist auf einer einzelnen Aufgabe und sind als Hinweise zu verstehen. " +
+            `Durchlauf ${durchlaufId}, Start ${startUhrzeit} Uhr, ` +
+            (versuchAufGeraet > 0 ? `${versuchAufGeraet}. Versuch auf diesem Gerät.` : "Versuchszahl auf diesem Gerät unbekannt.");
+        profilBox.appendChild(fussnote);
+
+        // Kompaktes Profil und Antwortprotokoll für die Lehrkraft (Forms, optional)
+        const dauerMinuten = startZeit ? Math.round((Date.now() - startZeit) / 60000) : 0;
+        const hinweise = [];
+        if (!hoerteilAktiv) hinweise.push("ohne Hoerteil");
+        if (alsTextGelesen) hinweise.push("Hoertexte als Text");
+        if (keineEnglischeStimme) hinweise.push("keine engl. Stimme");
+        const profilText =
+            `Niveau ${finalLevelName}${!niveau.gesichert ? " (nicht gesichert)" : ""}` +
+            ` | Bereich ${levelNames[niveau.untere]}-${levelNames[niveau.obere]}` +
+            ` | Schaetzwert ${niveau.theta.toFixed(2)} (SE ${niveau.standardfehler.toFixed(2)})` +
+            ` | G ${grammatik.r}/${grammatik.n} [${grammatik.stufenText}]` +
+            ` | W ${wortschatz.r}/${wortschatz.n} [${wortschatz.stufenText}]` +
+            (lesen.n ? ` | L ${lesen.r}/${lesen.n}` : "") +
+            (hoerteilAktiv ? ` | H ${hoeren.r}/${hoeren.n} [${hoeren.stufenText}]` : "") +
+            (anzahlWeissNicht ? ` | weiss nicht ${anzahlWeissNicht}x` : "") +
+            ` | Dauer ${dauerMinuten} min` +
+            ` | Durchlauf ${durchlaufId}, Start ${startUhrzeit}, Versuch ${versuchAufGeraet > 0 ? versuchAufGeraet : "?"} auf Geraet` +
+            (hinweise.length ? ` | Hinweise: ${hinweise.join(", ")}` : "") +
+            ` | Protokoll (+ richtig, - falsch, ? weiss nicht): ` + protokoll.map(p =>
+                p.id + (p.richtig ? "+" : p.weissNicht ? "?" : "-") + (p.bereich === "H" && !p.alsText ? "(" + p.wiedergaben + "x)" : "")
+            ).join(" ");
 
         // 1. Die echten Test-Daten für die URL vorbereiten:
-        //    WICHTIG: Übermittelt wird finalLevelName - also exakt das Niveau, das
-        //    auch angezeigt wird. Zuvor stand hier levelNames[currentLevel], also der
-        //    zufällige Endstand des adaptiven Verfahrens. Angezeigtes und übermitteltes
-        //    Niveau konnten dadurch auseinanderfallen.
+        //    Übermittelt wird finalLevelName - also exakt das Niveau, das auch
+        //    angezeigt wird (weiterhin eine der Stufen A1 bis C2).
         const datumRoh = new Date().toLocaleDateString('de-DE');
 
         const name = encodeURIComponent(studentData.name);
@@ -574,17 +1248,48 @@
 
         // 3. Forms-URL mit den bestehenden Frage-IDs (unverändert, damit der
         //    Power-Automate-Flow zur Excel-Tabelle weiterhin funktioniert):
-        const zielURL = `https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=7SyNXj2n30SXbho9pP832qUBc30aVt9Cg2VjA1EW5iJUOE5LUFpCREpEMlRCQ1BRRkNWUVlNMVcyNi4u&rdd8f34a7485e45e1aa5a0e136674b225=${name}&rc968aa4395c74ed9b61838919acdc992=${klasse}&r71ff7d1b5d2847ef9e3d0f14c093805c=${datum}&rfc708ff816e2484492209f3586331347=${punkte}&rb4037a30554e4416a48a7a34c31f9527=${level}&r9a0d6d5e347a4b248e32226da17ee4f1=${pruefcode}`;
+        let zielURL = `https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=7SyNXj2n30SXbho9pP832qUBc30aVt9Cg2VjA1EW5iJUOE5LUFpCREpEMlRCQ1BRRkNWUVlNMVcyNi4u&rdd8f34a7485e45e1aa5a0e136674b225=${name}&rc968aa4395c74ed9b61838919acdc992=${klasse}&r71ff7d1b5d2847ef9e3d0f14c093805c=${datum}&rfc708ff816e2484492209f3586331347=${punkte}&rb4037a30554e4416a48a7a34c31f9527=${level}&r9a0d6d5e347a4b248e32226da17ee4f1=${pruefcode}`;
+        if (PROFIL_FELD_ID) {
+            zielURL += `&${PROFIL_FELD_ID}=${encodeURIComponent(profilText)}`;
+        }
 
-        // 4. Manueller Ersatzlink, falls die automatische Weiterleitung blockiert wird:
+        // 4. Übermittlung nur per Klick, ohne automatische Weiterleitung (C-27).
+        //    Das Formular öffnet sich in einem neuen Tab; diese Seite bleibt offen.
         const ersatzLink = document.getElementById("manual-forms-link");
         ersatzLink.href = zielURL;
         ersatzLink.style.display = "inline-block";
+        ersatzLink.onclick = () => {
+            uebermittlungGeoeffnet = true;
+            document.getElementById("uebermittlung-status").textContent =
+                "Das Formular wurde in einem neuen Tab geöffnet. Klicke dort unten auf „Absenden“. Falls sich nichts geöffnet hat, klicke noch einmal auf den Button.";
+        };
 
-        // 5. Nach 5 Sekunden automatisch zu Forms weiterleiten:
-        setTimeout(() => {
-            window.location.href = zielURL;
-        }, 5000);
+        document.querySelector("#result h2").setAttribute("tabindex", "-1");
+        document.querySelector("#result h2").focus();
+    }
+
+    // ==== Initialisierung (am Skriptende, damit alle Konstanten definiert sind) ====
+    // Umfangsangabe in der Einführung an den Modus anpassen (C-37)
+    if (!hoerteilAktiv) {
+        document.getElementById("intro-umfang").textContent =
+            `Du bearbeitest ${maxQuestions} Aufgaben. Das dauert etwa 15 bis 20 Minuten.`;
+    }
+
+    // Prüfcode-Testansicht (C-28): ...index.html?pruefcode
+    if (new URLSearchParams(window.location.search).has("pruefcode")) {
+        document.getElementById("student-form").style.display = "none";
+        document.getElementById("pruefcode-test").style.display = "block";
+        document.getElementById("pc-datum").value = new Date().toLocaleDateString("de-DE");
+        const aktualisierePruefcode = () => {
+            const wert = id => document.getElementById(id).value;
+            const code = berechnePruefcode(wert("pc-name"), wert("pc-klasse"), wert("pc-datum"), wert("pc-punkte"), wert("pc-niveau"));
+            const basis = [grossschreibung(wert("pc-name").trim()), grossschreibung(wert("pc-klasse").trim()),
+                wert("pc-datum"), wert("pc-punkte"), wert("pc-niveau")].join("|");
+            document.getElementById("pc-ergebnis").textContent =
+                `Prüfcode: ${code}  (berechnet aus: ${basis}; ESZETT_BEIBEHALTEN = ${ESZETT_BEIBEHALTEN})`;
+        };
+        document.querySelectorAll("#pruefcode-test input").forEach(i => i.addEventListener("input", aktualisierePruefcode));
+        aktualisierePruefcode();
     }
 </script>
 
