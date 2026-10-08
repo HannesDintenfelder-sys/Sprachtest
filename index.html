@@ -551,11 +551,12 @@
         ]
     ];
 
-    // Lesetexte: Jede Person bearbeitet 2 Texte mit je 3 Fragen. Der Text wird
-    // passend zur aktuellen Stufe gewählt (A1 bis C2, je Stufe mindestens ein
-    // Text, ab A2 je zwei). Die
-    // Antworten verändern die adaptive Stufe nicht und werden als eigener
-    // Bereich "Leseverstehen" ausgewiesen. Kontexte: Alltag, Büro/Handel, Gesundheit.
+    // Lesetexte: Jede Person bearbeitet 2 Texte mit je 3 Fragen (A1 bis C2, je
+    // Stufe mindestens ein Text, ab A2 je zwei). Der erste Text wird passend zum
+    // laufenden Grammatik/Wortschatz-Schätzwert gewählt, der zweite nach dem
+    // Ergebnis des ersten (siehe loadNextQuestion). Die Antworten verändern die
+    // adaptive Stufe nicht und werden als eigener Bereich "Leseverstehen"
+    // ausgewiesen. Kontexte: Alltag, Büro/Handel, Gesundheit.
     const lesetexte = [
         { id: "L-A1", stufe: 0, titel: "A note on the fridge",
           text: "Hi Tom,\nI am at the doctor's at 3 o'clock. Please feed the cat at 5. The cat food is in the kitchen, next to the fridge. See you at 7!\nMia",
@@ -650,13 +651,13 @@
     }
 
     // Einstufung (C-01, C-02): nicht mehr über die Punktsumme, sondern über eine
-    // Fähigkeitsschätzung aus ALLEN Antworten des adaptiven Teils (Grammatik,
-    // Wortschatz, Lesen), wie bei adaptiven Tests üblich (Maximum-Likelihood mit
+    // Fähigkeitsschätzung aus allen Antworten des adaptiven Teils (nur Grammatik
+    // und Wortschatz), wie bei adaptiven Tests üblich (Maximum-Likelihood mit
     // Ratewahrscheinlichkeit 25 % und schwacher Vorannahme um B1).
     // Skala: 0 = A1, 1 = A2, ... 5 = C2. Ein Schätzwert von z. B. 2,4 heißt:
     // B1-Aufgaben werden überwiegend gelöst, B2-Aufgaben überwiegend noch nicht.
     // Aus dem Standardfehler ergibt sich ein Bereich (Schätzwert ± 1 Standardfehler).
-    // Höraufgaben werden getrennt ausgewiesen und fließen hier nicht ein.
+    // Lese- und Höraufgaben werden getrennt ausgewiesen und fließen hier nicht ein.
     const RATEWAHRSCHEINLICHKEIT = 0.25;
     const TRENNSCHAERFE = 2;
     const VORANNAHME_MITTEL = 2.5;  // Mitte von B1
@@ -982,6 +983,12 @@
         window.speechSynthesis.speak(utterance);
     }
 
+    // Laufender Schätzwert aus den bisherigen Grammatik/Wortschatz-Antworten (F-03).
+    // Ohne Antworten ergibt die Vorannahme B1.
+    function laufendeStufe() {
+        return ermittleNiveau(protokoll.filter(p => p.bereich === "G" || p.bereich === "W")).stufe;
+    }
+
     function aktualisiereAudioAnzeige() {
         const playBtn = document.getElementById("play-audio-btn");
         const label = document.getElementById("play-audio-label");
@@ -1006,9 +1013,22 @@
 
         const typ = ABLAUF[questionsAsked];
         if (typ === "L") {
-            // Neuer Lesetext, wenn noch keiner läuft oder alle Fragen bearbeitet sind
+            // Neuer Lesetext, wenn noch keiner läuft oder alle Fragen bearbeitet sind.
+            // F-03: Erster Text auf der laufend geschätzten Stufe (nicht auf dem
+            // schwankenden Zwischenstand des Treppenverfahrens); der zweite Text
+            // richtet sich nach dem Ergebnis des ersten (3/3 -> eine Stufe höher,
+            // 0-1/3 -> eine Stufe tiefer, sonst gleiche Stufe).
             if (!aktuellerLesetext || leseFrageIndex >= aktuellerLesetext.fragen.length) {
-                aktuellerLesetext = waehleLesetext(currentLevel, benutzteLesetexte);
+                let zielStufe = laufendeStufe();
+                if (aktuellerLesetext) {
+                    const vorher = aktuellerLesetext;
+                    const richtigImText = protokoll.filter(p =>
+                        p.richtig && vorher.fragen.some(f => f.id === p.id)).length;
+                    const anzahl = vorher.fragen.length;
+                    zielStufe = vorher.stufe + (richtigImText === anzahl ? 1 : richtigImText <= 1 ? -1 : 0);
+                    zielStufe = Math.max(0, Math.min(levelNames.length - 1, zielStufe));
+                }
+                aktuellerLesetext = waehleLesetext(zielStufe, benutzteLesetexte);
                 benutzteLesetexte.add(aktuellerLesetext.id);
                 leseFrageIndex = 0;
             }
@@ -1025,7 +1045,10 @@
             currentQuestionLevel = aktuellerLesetext.stufe;
             leseFrageIndex++;
         } else {
-            const auswahl = waehleAufgabe(currentLevel, typ === "H", usedQuestions, benutzteKonstrukte);
+            // F-03: Höraufgaben auf der laufend geschätzten Stufe, adaptive
+            // Grammatik/Wortschatz-Aufgaben auf dem Stand des Treppenverfahrens
+            const stufe = typ === "H" ? laufendeStufe() : currentLevel;
+            const auswahl = waehleAufgabe(stufe, typ === "H", usedQuestions, benutzteKonstrukte);
             currentQuestionData = auswahl.frage;
             currentQuestionLevel = auswahl.stufe;
         }
@@ -1236,7 +1259,7 @@
                 zusammenfassung.appendChild(document.createTextNode(wert));
             });
 
-        // Einstufung aus dem adaptiven Teil (ohne Höraufgaben), siehe ermittleNiveau()
+        // Einstufung nur aus Grammatik und Wortschatz (ohne Lesen und Hören), siehe ermittleNiveau()
         const niveau = ermittleNiveau(protokoll.filter(p => p.bereich === "G" || p.bereich === "W"));
         const finalLevelIndex = niveau.stufe;
         const finalLevelName = levelNames[finalLevelIndex];
@@ -1298,7 +1321,23 @@
         const zeile = neueListe("Profil (richtig gelöst / bearbeitet, je Stufe):");
         zeile(`Grammatik: ${grammatik.r} von ${grammatik.n}` + (grammatik.n ? ` (${grammatik.stufenText})` : ""));
         zeile(`Wortschatz und feste Wendungen: ${wortschatz.r} von ${wortschatz.n}` + (wortschatz.n ? ` (${wortschatz.stufenText})` : ""));
-        zeile(`Leseverstehen: ${lesen.r} von ${lesen.n}` + (lesen.n ? ` (${lesen.stufenText})` : ""));
+        // F-03: Lesen je Text ausweisen; "gelöst" = mindestens 2 von 3 Fragen richtig
+        const leseErgebnisse = lesetexte
+            .filter(t => benutzteLesetexte.has(t.id))
+            .map(t => {
+                const eintraege = protokoll.filter(p => t.fragen.some(f => f.id === p.id));
+                return { text: t, n: eintraege.length, r: eintraege.filter(p => p.richtig).length };
+            })
+            .filter(e => e.n > 0);
+        const geloesteTexte = leseErgebnisse.filter(e => e.r >= 2 && e.r / e.n >= 0.6);
+        const leseEinordnung = geloesteTexte.length
+            ? `Texte bis ${levelNames[Math.max(...geloesteTexte.map(e => e.text.stufe))]} überwiegend verstanden`
+            : (leseErgebnisse.length
+                ? `noch kein Text überwiegend verstanden (niedrigste Textstufe: ${levelNames[Math.min(...leseErgebnisse.map(e => e.text.stufe))]})`
+                : "nicht bearbeitet");
+        zeile(`Leseverstehen: ${lesen.r} von ${lesen.n} – ` +
+            leseErgebnisse.map(e => `Text auf ${levelNames[e.text.stufe]}: ${e.r}/${e.n}`).join(", ") +
+            ` → ${leseEinordnung}`);
         if (hoerteilAktiv) {
             zeile(`Hörverstehen: ${hoeren.r} von ${hoeren.n} (${hoeren.stufenText})` +
                 (alsTextGelesen ? " – Hörtexte wurden als Text gelesen" : ""));
@@ -1309,25 +1348,40 @@
 
         // Gelöste und nicht gelöste Bereiche (C-11): Hinweise für die Förderplanung.
         // Jeder Eintrag beruht meist auf nur einer Aufgabe - Hinweis, kein Befund.
-        const konstruktListe = (geloest) => {
+        // F-04: Im adaptiven Test werden Aufgaben oberhalb der eigenen Stufe
+        // absichtlich gestellt und meist nicht gelöst. Als möglicher Förderbedarf
+        // zählen deshalb nur nicht gelöste Aufgaben auf oder unter der ermittelten Stufe.
+        const konstruktListe = (bedingung) => {
             const eintraege = [];
-            protokoll.filter(p => p.bereich !== "H" && p.richtig === geloest).forEach(p => {
+            protokoll.filter(p => p.bereich !== "H" && bedingung(p)).forEach(p => {
                 const text = `${p.konstrukt} (${levelNames[p.stufe]})`;
                 if (!eintraege.includes(text)) eintraege.push(text);
             });
             return eintraege;
         };
-        const geloesteBereiche = konstruktListe(true);
-        const offeneBereiche = konstruktListe(false);
-        const geloestZeile = neueListe("Sicher gelöst:");
+        const geloesteBereiche = konstruktListe(p => p.richtig);
+        const foerderBereiche = konstruktListe(p => !p.richtig && p.stufe <= finalLevelIndex);
+        const oberhalbNichtGeloest = protokoll.filter(p =>
+            p.bereich !== "H" && !p.richtig && p.stufe > finalLevelIndex).length;
+        const geloestZeile = neueListe("Gelöst:");
         geloesteBereiche.length ? geloesteBereiche.forEach(geloestZeile) : geloestZeile("–");
-        const offenZeile = neueListe("Nicht gelöst (möglicher Förderbedarf):");
-        offeneBereiche.length ? offeneBereiche.forEach(offenZeile) : offenZeile("–");
+        const offenZeile = neueListe(`Nicht gelöst auf oder unter der ermittelten Stufe ${finalLevelName} (möglicher Förderbedarf):`);
+        foerderBereiche.length ? foerderBereiche.forEach(offenZeile) : offenZeile("–");
+        if (oberhalbNichtGeloest > 0) {
+            const oberhalbHinweis = document.createElement("div");
+            oberhalbHinweis.className = "klein";
+            oberhalbHinweis.textContent =
+                `Außerdem ${oberhalbNichtGeloest} Aufgabe${oberhalbNichtGeloest === 1 ? "" : "n"} oberhalb der ermittelten Stufe nicht gelöst. ` +
+                "Das ist im adaptiven Test so vorgesehen und kein Förderbedarf.";
+            profilBox.appendChild(oberhalbHinweis);
+        }
 
         const fussnote = document.createElement("div");
         fussnote.className = "klein";
         fussnote.textContent =
             "Schreiben und Sprechen wurden in diesem Test nicht erfasst. " +
+            "Lese- und Hörtexte wurden passend zum laufenden Grammatik/Wortschatz-Schätzwert gewählt; " +
+            "der zweite Lesetext richtet sich zusätzlich nach dem Ergebnis des ersten. " +
             "Die Bereichsangaben beruhen meist auf einer einzelnen Aufgabe und sind als Hinweise zu verstehen. " +
             `Durchlauf ${durchlaufId}, Start ${startUhrzeit} Uhr, ` +
             (versuchAufGeraet > 0 ? `${versuchAufGeraet}. Versuch auf diesem Gerät.` : "Versuchszahl auf diesem Gerät unbekannt.");
@@ -1345,7 +1399,9 @@
             ` | Schaetzwert ${niveau.theta.toFixed(2)} (SE ${niveau.standardfehler.toFixed(2)})` +
             ` | G ${grammatik.r}/${grammatik.n} [${grammatik.stufenText}]` +
             ` | W ${wortschatz.r}/${wortschatz.n} [${wortschatz.stufenText}]` +
-            (lesen.n ? ` | L ${lesen.r}/${lesen.n} [${lesen.stufenText}]` : "") +
+            (lesen.n ? ` | L ${lesen.r}/${lesen.n} [` +
+                leseErgebnisse.map(e => `${e.text.id.slice(2)} ${e.r}/${e.n}`).join(", ") + `] ${leseEinordnung}` : "") +
+            ` | Foerderbedarf: ${foerderBereiche.length ? foerderBereiche.join("; ") : "-"}` +
             (hoerteilAktiv ? ` | H ${hoeren.r}/${hoeren.n} [${hoeren.stufenText}]` : "") +
             (anzahlWeissNicht ? ` | weiss nicht ${anzahlWeissNicht}x` : "") +
             ` | Dauer ${dauerMinuten} min` +
